@@ -45,11 +45,11 @@ Rolled after the base type. Some independent, some in mutually exclusive groups:
 - **Color group (at most one):** a set of hue variants, or none
 
 ### Exact odds
-Every pull shows the exact probability of that specific lute:
-- Multiply the probability of every outcome that happened: base type, each group's result, each independent modifier that rolled
-- **Include the misses:** independent modifiers that didn't roll contribute (1 minus their chance)
+Every pull shows the exact probability of that lute's traits:
+- Multiply the base type's chance by the chance of every modifier the lute **has**: each non-default group result (e.g. jumbo, a color) and each independent modifier that rolled
+- **Misses don't count** (decided in #3): modifiers that didn't roll, normal size, and no color add nothing, so every extra modifier always makes a lute rarer
 - Display as "1 in N" (rounded, with thousands separators), with the percentage available on hover
-- Example: theorbo (5%) × holographic (2%) × jumbo (4%) × not negative (97%) × not gilded (99%) ≈ 1 in 26,000
+- Example: theorbo (5%) × jumbo (4%) × holographic (2%) = 1 in 25,000
 
 ### Tiers
 Derived from the exact odds using thresholds, so tier and number always agree:
@@ -85,7 +85,7 @@ Loot-style names built from the roll: modifiers as prefixes, an occasional suffi
 
 ## Engineering expectations
 - **Rolling logic is pure and testable:** pass in a random number source so tests can use fixed or seeded values
-- Unit tests for: odds calculation (including misses and groups), tier assignment at exact thresholds, name generation, trophy case sorting and top-10 cutoff
+- Unit tests for: odds calculation (including groups, and misses not counting), tier assignment at exact thresholds, name generation, trophy case sorting and top-10 cutoff
 - **A simulation script:** roll a large number of boxes and report the actual tier distribution against expected odds, so Ryan can tune balance with real numbers
 - All odds and tiers in one config file, never scattered through code
 - CI runs tests on every push
