@@ -31,10 +31,21 @@
  */
 
 /**
+ * A rarity tier. Thresholds aren't set by hand: the game works out the
+ * odds cutoffs that make each tier appear about `targetShare` of the time.
+ * @typedef {object} Tier
+ * @property {string} id
+ * @property {string} name
+ * @property {string} color CSS color for the tier.
+ * @property {number} targetShare Fraction of all pulls, from 0 to 1.
+ */
+
+/**
  * @typedef {object} Config
  * @property {Option[]} baseTypes
  * @property {Group[]} groups
  * @property {Option[]} independentModifiers
+ * @property {Tier[]} tiers
  */
 
 /** @type {Config} */
@@ -83,5 +94,19 @@ export const CONFIG = {
     { id: 'holographic', name: 'Holographic', chance: 0.02 }, // PLACEHOLDER
     { id: 'cursed', name: 'Cursed', chance: 0.015 }, // PLACEHOLDER
     { id: 'gilded', name: 'Gilded', chance: 0.01 }, // PLACEHOLDER
+  ],
+
+  // Most common first. targetShare is the fraction of all pulls that should
+  // land in each tier, and they must add up to 1. The game calculates the
+  // odds thresholds that come closest to these (see src/tiers.js), so adding
+  // or retuning modifiers can't quietly change how often a tier shows up.
+  tiers: [
+    { id: 'common', name: 'Common', color: '#9d9d9d', targetShare: 0.6 }, // PLACEHOLDER
+    { id: 'uncommon', name: 'Uncommon', color: '#1eff00', targetShare: 0.25 }, // PLACEHOLDER
+    { id: 'rare', name: 'Rare', color: '#0070dd', targetShare: 0.1 }, // PLACEHOLDER
+    { id: 'epic', name: 'Epic', color: '#a335ee', targetShare: 0.04 }, // PLACEHOLDER
+    { id: 'legendary', name: 'Legendary', color: '#ff8000', targetShare: 0.009 }, // PLACEHOLDER
+    // Color is a PLACEHOLDER: the handoff only sets gray through orange.
+    { id: 'mythic', name: 'Mythic', color: '#ff2a6d', targetShare: 0.001 }, // PLACEHOLDER
   ],
 };

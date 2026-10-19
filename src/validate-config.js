@@ -20,6 +20,9 @@ export function validateConfig(config) {
     }
   }
 
+  const tierShares = config.tiers.map((tier) => ({ chance: tier.targetShare }));
+  checkSumsToOne('Tier target shares', tierShares);
+
   for (const modifier of config.independentModifiers) {
     if (!(modifier.chance > 0 && modifier.chance < 1)) {
       throw new Error(
