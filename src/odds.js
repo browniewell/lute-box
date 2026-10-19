@@ -1,4 +1,5 @@
 import { CONFIG } from './config.js';
+import { findById } from './lookup.js';
 
 /**
  * The probability of a lute's traits: its base type chance times the
@@ -25,12 +26,4 @@ export function exactOdds(roll, config = CONFIG) {
   }
 
   return odds;
-}
-
-function findById(items, id) {
-  const item = items.find((candidate) => candidate.id === id);
-  if (!item) {
-    throw new Error(`Unknown id in roll: "${id}"`);
-  }
-  return item;
 }

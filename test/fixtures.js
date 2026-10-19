@@ -31,6 +31,35 @@ export const TEST_CONFIG = {
     { id: 'negative', name: 'Negative', chance: 0.03 },
     { id: 'gilded', name: 'Gilded', chance: 0.01 },
   ],
+  tiers: [
+    { id: 'common', name: 'Common', color: '#9d9d9d', targetShare: 0.7 },
+    { id: 'rare', name: 'Rare', color: '#0070dd', targetShare: 0.25 },
+    { id: 'legendary', name: 'Legendary', color: '#ff8000', targetShare: 0.05 },
+  ],
+};
+
+// A config small enough to work out tiers by hand:
+//
+//   lute    (odds 0.9)  appears 0.9 x 0.9 = 81% of the time
+//   gilded lute    (0.09)  0.9 x 0.1 =  9%
+//   theorbo (0.1)       0.1 x 0.9 =  9%
+//   gilded theorbo (0.01)  0.1 x 0.1 =  1%
+//
+// Ranked rarest first, the running share of pulls is 1%, 10%, 19%, 100%.
+// So a 1% legendary target cuts after gilded theorbo (odds 0.01), and
+// legendary + rare = 19% cuts after theorbo (odds 0.1).
+export const TINY_CONFIG = {
+  baseTypes: [
+    { id: 'lute', name: 'Lute', chance: 0.9 },
+    { id: 'theorbo', name: 'Theorbo', chance: 0.1 },
+  ],
+  groups: [],
+  independentModifiers: [{ id: 'gilded', name: 'Gilded', chance: 0.1 }],
+  tiers: [
+    { id: 'common', name: 'Common', color: '#9d9d9d', targetShare: 0.81 },
+    { id: 'rare', name: 'Rare', color: '#0070dd', targetShare: 0.18 },
+    { id: 'legendary', name: 'Legendary', color: '#ff8000', targetShare: 0.01 },
+  ],
 };
 
 // A "random" source that returns the given values in order, so a test can

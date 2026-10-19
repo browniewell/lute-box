@@ -4,6 +4,7 @@
   "type": "module",
   "description": "Click to open a box, get a lute of some rarity, repeat.",
   "scripts": {
-    "test": "node --test \"test/**/*.test.js\""
+    "test": "node --test \"test/**/*.test.js\"",
+    "simulate": "node scripts/simulate.js"
   }
 }

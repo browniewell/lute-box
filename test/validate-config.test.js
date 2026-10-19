@@ -41,3 +41,9 @@ test('independent modifier chances must be between 0 and 1', () => {
   config.independentModifiers[0].chance = 1.5;
   assert.throws(() => validateConfig(config), /holographic/i);
 });
+
+test('tier target shares must sum to 1', () => {
+  const config = copyOfTestConfig();
+  config.tiers[0].targetShare = 0.5;
+  assert.throws(() => validateConfig(config), /tier.*sum to 1/i);
+});
