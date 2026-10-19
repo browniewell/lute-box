@@ -1,3 +1,4 @@
+// @ts-check
 // Every odds number in the game lives in this file.
 //
 // - `chance` is a probability from 0 to 1 (0.05 = 5%).
@@ -8,6 +9,35 @@
 //
 // Values marked PLACEHOLDER are waiting on Ryan's decisions in issue #1.
 
+// The types below are JSDoc comments: VS Code reads them for autocomplete
+// and, thanks to @ts-check, underlines entries with a wrong shape. They
+// change nothing at runtime. validateConfig checks the numbers themselves.
+
+/**
+ * One thing that can be picked: a base type, a group option, or an
+ * independent modifier.
+ * @typedef {object} Option
+ * @property {string} id Stable key used in code and saved data.
+ * @property {string} name Shown to the player.
+ * @property {number} chance Probability from 0 to 1 (0.05 = 5%).
+ * @property {boolean} [isDefault] Group options only: means "no modifier".
+ */
+
+/**
+ * A set of options where exactly one is picked, like size or color.
+ * @typedef {object} Group
+ * @property {string} id
+ * @property {Option[]} options
+ */
+
+/**
+ * @typedef {object} Config
+ * @property {Option[]} baseTypes
+ * @property {Group[]} groups
+ * @property {Option[]} independentModifiers
+ */
+
+/** @type {Config} */
 export const CONFIG = {
   // One is always picked.
   baseTypes: [

@@ -5,6 +5,7 @@
 // rounding-sized gap when checking that chances add up to 1.
 const TOLERANCE = 1e-9;
 
+/** @param {import('./config.js').Config} config */
 export function validateConfig(config) {
   checkSumsToOne('Base types', config.baseTypes);
 

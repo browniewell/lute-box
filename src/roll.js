@@ -1,10 +1,24 @@
 import { CONFIG } from './config.js';
 
-// Rolls one lute. `random` is any function returning values in [0, 1),
-// like Math.random, so tests can pass in fixed or seeded values.
-//
-// Roll order is fixed: base type, then each group, then each independent
-// modifier, all in config order. Seeded runs depend on that order.
+/**
+ * The result of one roll. All values are ids from the config.
+ * @typedef {object} Roll
+ * @property {string} baseType
+ * @property {Record<string, string>} groups Group id -> picked option id.
+ * @property {string[]} modifiers Independent modifiers that hit.
+ */
+
+/**
+ * Rolls one lute. `random` is any function returning values in [0, 1),
+ * like Math.random, so tests can pass in fixed or seeded values.
+ *
+ * Roll order is fixed: base type, then each group, then each independent
+ * modifier, all in config order. Seeded runs depend on that order.
+ *
+ * @param {() => number} random
+ * @param {import('./config.js').Config} [config]
+ * @returns {Roll}
+ */
 export function rollLute(random, config = CONFIG) {
   const baseType = pickOne(config.baseTypes, random).id;
 
