@@ -1,0 +1,17 @@
+name: Tests
+
+# Every push (any branch) and every PR, per the handoff doc.
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          # 21+ is needed for glob patterns in `node --test`; 24 is an LTS release.
+          node-version: 24
+      - run: npm test
