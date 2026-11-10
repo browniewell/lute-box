@@ -14,21 +14,31 @@ import { findById } from './lookup.js';
  * @returns {string}
  */
 export function lootName(roll, config = CONFIG) {
-  const prefixes = [];
-
-  for (const group of config.groups) {
-    const option = findById(group.options, roll.groups[group.id]);
-    if (!option.isDefault) {
-      prefixes.push(option);
-    }
-  }
-  for (const modifierId of roll.modifiers) {
-    prefixes.push(findById(config.independentModifiers, modifierId));
-  }
-
   // Highest chance first. sort is stable, so ties keep config order.
-  prefixes.sort((a, b) => b.chance - a.chance);
+  const prefixes = modifiersOf(roll, config).sort((a, b) => b.chance - a.chance);
 
   const baseType = findById(config.baseTypes, roll.baseType);
   return [...prefixes.map((prefix) => prefix.name), baseType.name].join(' ');
+}
+
+/**
+ * Every modifier a lute has: non-default group results, then independent
+ * modifiers that hit, in config order. Each comes with its own chance.
+ *
+ * @param {import('./roll.js').Roll} roll
+ * @param {import('./config.js').Config} [config]
+ * @returns {import('./config.js').Option[]}
+ */
+export function modifiersOf(roll, config = CONFIG) {
+  const modifiers = [];
+  for (const group of config.groups) {
+    const option = findById(group.options, roll.groups[group.id]);
+    if (!option.isDefault) {
+      modifiers.push(option);
+    }
+  }
+  for (const modifierId of roll.modifiers) {
+    modifiers.push(findById(config.independentModifiers, modifierId));
+  }
+  return modifiers;
 }

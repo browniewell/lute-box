@@ -14,7 +14,15 @@
     #stage { position: relative; min-height: 12rem; display: flex; align-items: center; margin-top: 1.5rem;
       /* As wide as the lute, so effects placed at 50% center on it. */
       width: fit-content; }
-    [data-field="odds"] { text-decoration: underline dotted; cursor: help; }
+    [data-field="odds"], .trophy .odds { text-decoration: underline dotted; cursor: help; }
+    #records { margin-top: 3rem; }
+    #records dt { font-weight: bold; }
+    #records dd { margin: 0 0 0.5rem; }
+    #trophies { padding-left: 1.5rem; }
+    .trophy { margin-bottom: 1rem; }
+    .trophy > * { display: inline-block; vertical-align: middle; }
+    /* Sprites at half size, in a fixed-width column so the text lines up. */
+    .trophy-sprite { zoom: 0.5; width: 12rem; margin-right: 1rem; text-align: center; }
   </style>
 </head>
 <body>
@@ -35,6 +43,24 @@
     <p>Tier: <span data-field="tier"></span></p>
     <p>Odds: <span data-field="odds"></span></p>
   </div>
+
+  <section id="records">
+    <h2>Stats</h2>
+    <p id="storage-note" role="status" hidden></p>
+    <dl>
+      <dt>Boxes opened</dt><dd data-stat="opened"></dd>
+      <dt>Best pull ever</dt><dd data-stat="best"></dd>
+      <dt>Rarest modifier found</dt><dd data-stat="modifier"></dd>
+      <dt>Pulls per tier</dt><dd><ul id="tier-counts"></ul></dd>
+    </dl>
+
+    <h2>Trophy case</h2>
+    <p><small>Your 10 rarest lutes ever.</small></p>
+    <p id="trophies-empty">Open a box to start your collection.</p>
+    <ol id="trophies"></ol>
+
+    <button id="reset-button" type="button">Reset trophies and stats</button>
+  </section>
 
 </main>
 
