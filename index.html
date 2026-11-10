@@ -4,9 +4,27 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lute Box</title>
+  <style>
+    /* Basic readability only; real styling comes in a later milestone. */
+    body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+    button { font-size: 1.25rem; padding: 0.5rem 1.5rem; }
+    [data-field="odds"] { text-decoration: underline dotted; cursor: help; }
+  </style>
 </head>
 <body>
-  <h1 id="game-title">Loading…</h1>
+  <h1>Lute Box</h1>
+
+  <p id="config-error" role="alert" hidden></p>
+
+  <button id="open-button" type="button">Open</button>
+  <p><small>or press Space</small></p>
+
+  <!-- aria-live reads each new lute aloud to screen readers. -->
+  <div id="reveal" aria-live="polite" hidden>
+    <p><strong data-field="name"></strong></p>
+    <p>Tier: <span data-field="tier"></span></p>
+    <p>Odds: <span data-field="odds"></span></p>
+  </div>
 
   <!-- type="module" lets the page and the Node tests share the same files in src/. -->
   <script type="module" src="src/main.js"></script>
