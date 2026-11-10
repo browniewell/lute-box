@@ -20,6 +20,7 @@ test('effects never get smaller as tiers get rarer', () => {
     assert.ok(more.particles >= less.particles, `particles, ${label}`);
     assert.ok(more.flash || !less.flash, `flash, ${label}`);
     assert.ok(more.beam !== 'none' || less.beam === 'none', `beam, ${label}`);
+    assert.ok(more.screenShake || !less.screenShake, `screen shake, ${label}`);
   }
 });
 

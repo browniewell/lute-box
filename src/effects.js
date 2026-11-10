@@ -23,7 +23,7 @@ export const TIER_EFFECTS = {
   uncommon: { anticipationMs: 700, shake: 3, particles: 0, flash: false, beam: 'none', screenShake: false },
   rare: { anticipationMs: 900, shake: 4, particles: 12, flash: false, beam: 'none', screenShake: false },
   epic: { anticipationMs: 1200, shake: 5, particles: 24, flash: true, beam: 'none', screenShake: false },
-  legendary: { anticipationMs: 1600, shake: 6, particles: 36, flash: true, beam: 'light', screenShake: false },
+  legendary: { anticipationMs: 1600, shake: 6, particles: 36, flash: true, beam: 'light', screenShake: true },
   mythic: { anticipationMs: 2200, shake: 8, particles: 60, flash: true, beam: 'rainbow', screenShake: true },
 };
 
