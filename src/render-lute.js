@@ -1,0 +1,75 @@
+// Draws a lute with its modifiers into a page element. Browser only; the
+// decisions about what it should look like live in look.js.
+import { SPRITES, PALETTE } from './sprites.js';
+import { luteLook, sparklePoints } from './look.js';
+
+const SPARKLE_COUNT = 5;
+
+/**
+ * Replaces the contents of `container` with the lute for `roll`.
+ * Styles are in lute.css.
+ *
+ * @param {HTMLElement} container
+ * @param {import('./roll.js').Roll} roll
+ */
+export function renderLute(container, roll) {
+  const sprite = SPRITES[roll.baseType];
+  const look = luteLook(roll);
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'lute';
+  wrapper.style.transform = `rotate(${look.rotation}deg)`;
+
+  const canvas = drawSprite(sprite, look.pixelSize);
+  canvas.style.filter = look.filter;
+  wrapper.append(canvas);
+
+  if (look.holographic) {
+    // A rainbow layer cut to the lute's shape by using the sprite as a mask.
+    const overlay = document.createElement('div');
+    overlay.className = 'holographic';
+    const mask = `url(${canvas.toDataURL()})`;
+    overlay.style.maskImage = mask;
+    overlay.style.webkitMaskImage = mask;
+    wrapper.append(overlay);
+  }
+
+  if (look.sparkle) {
+    sparklePoints(sprite, SPARKLE_COUNT).forEach(({ x, y }, i) => {
+      const sparkle = document.createElement('span');
+      sparkle.className = 'sparkle';
+      sparkle.style.left = `${(x + 0.5) * look.pixelSize}px`;
+      sparkle.style.top = `${(y + 0.5) * look.pixelSize}px`;
+      sparkle.style.animationDelay = `${i * 0.37}s`;
+      wrapper.append(sparkle);
+    });
+  }
+
+  container.replaceChildren(wrapper);
+}
+
+// Draws each sprite pixel as a solid block. The canvas is sized in device
+// pixels, so on a Retina screen every block lands on whole screen pixels
+// and nothing gets smoothed or blurred.
+function drawSprite(sprite, pixelSize) {
+  const ratio = window.devicePixelRatio || 1;
+  const block = Math.round(pixelSize * ratio);
+  const width = sprite[0].length;
+  const height = sprite.length;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width * block;
+  canvas.height = height * block;
+  canvas.style.width = `${width * pixelSize}px`;
+  canvas.style.height = `${height * pixelSize}px`;
+
+  const context = canvas.getContext('2d');
+  sprite.forEach((row, y) => {
+    [...row].forEach((char, x) => {
+      if (char === '.') return;
+      context.fillStyle = PALETTE[char];
+      context.fillRect(x * block, y * block, block, block);
+    });
+  });
+  return canvas;
+}

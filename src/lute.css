@@ -1,0 +1,59 @@
+/* Lute sprite and modifier effects, shared by index.html and preview.html. */
+
+.lute {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+.lute canvas {
+  /* Backup for any scaling the browser does: keep pixels square and sharp. */
+  image-rendering: pixelated;
+}
+
+.holographic {
+  position: absolute;
+  inset: 0;
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  /* Fixed-width bands, so every lute shows the whole rainbow at any size. */
+  background: repeating-linear-gradient(
+    45deg,
+    #ff0040 0, #ff9900 10px, #ffee00 20px, #33ff66 30px,
+    #00ccff 40px, #6644ff 50px, #ff00cc 60px, #ff0040 70px
+  );
+  mix-blend-mode: color;
+  opacity: 0.85;
+  animation: holographic-shift 2s linear infinite;
+}
+
+/* At 45°, bands repeat every 70px × √2 ≈ 99px along x, so this loops seamlessly. */
+@keyframes holographic-shift {
+  from { background-position: 0 0; }
+  to { background-position: 98.99px 0; }
+}
+
+/* A four-point twinkle, drawn with two crossed bars. The dark gold edge
+   keeps it visible against gold wood and a light page. */
+.sparkle {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  background:
+    linear-gradient(#fffbe6, #fffbe6) center / 3px 100% no-repeat,
+    linear-gradient(#fffbe6, #fffbe6) center / 100% 3px no-repeat;
+  filter: drop-shadow(0 0 1px #7a5200) drop-shadow(0 0 1px #7a5200);
+  animation: twinkle 1.8s ease-in-out infinite;
+  opacity: 0;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.4); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .holographic, .sparkle { animation: none; }
+  .sparkle { opacity: 0.8; }
+}

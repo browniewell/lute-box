@@ -90,9 +90,7 @@ export const CONFIG = {
   independentModifiers: [
     { id: 'upside-down', name: 'Upside Down', chance: 0.035 }, // PLACEHOLDER
     { id: 'negative', name: 'Negative', chance: 0.03 }, // PLACEHOLDER
-    { id: 'ancient', name: 'Ancient', chance: 0.025 }, // PLACEHOLDER
     { id: 'holographic', name: 'Holographic', chance: 0.02 }, // PLACEHOLDER
-    { id: 'cursed', name: 'Cursed', chance: 0.015 }, // PLACEHOLDER
     { id: 'gilded', name: 'Gilded', chance: 0.01 }, // PLACEHOLDER
   ],
 

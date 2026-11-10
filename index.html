@@ -4,10 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lute Box</title>
+  <link rel="stylesheet" href="src/lute.css">
   <style>
     /* Basic readability only; real styling comes in a later milestone. */
     body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
     button { font-size: 1.25rem; padding: 0.5rem 1.5rem; }
+    /* Room for an upside-down jumbo theorbo without the page jumping much. */
+    [data-field="sprite"] { min-height: 12rem; display: flex; align-items: center; margin-top: 1.5rem; }
     [data-field="odds"] { text-decoration: underline dotted; cursor: help; }
   </style>
 </head>
@@ -21,6 +24,8 @@
 
   <!-- aria-live reads each new lute aloud to screen readers. -->
   <div id="reveal" aria-live="polite" hidden>
+    <!-- The sprite is decoration: the name below says which lute it is. -->
+    <div data-field="sprite" aria-hidden="true"></div>
     <p><strong data-field="name"></strong></p>
     <p>Tier: <span data-field="tier"></span></p>
     <p>Odds: <span data-field="odds"></span></p>

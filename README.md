@@ -14,6 +14,8 @@ python3 -m http.server 8000
 
 Then open <http://localhost:8000>.
 
+To review the sprites without rolling, open <http://localhost:8000/preview.html>. It shows every base type with every modifier, plus a few stacks.
+
 ## Run tests
 
 Needs Node 21 or newer. There are no dependencies to install.
