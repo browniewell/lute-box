@@ -1,16 +1,21 @@
 // Browser entry point. Keep game logic out of this file: anything here
 // touches the page, so it can't be unit tested in Node. The logic lives
-// in open-box.js, keyboard.js and look.js.
+// in open-box.js, keyboard.js, look.js and effects.js.
 import { CONFIG } from './config.js';
 import { validateConfig } from './validate-config.js';
 import { computeTiers } from './tiers.js';
 import { openBox } from './open-box.js';
 import { isSpaceToOpen } from './keyboard.js';
 import { renderLute } from './render-lute.js';
+import { effectPlan } from './effects.js';
+import { playAnticipation, playReveal } from './play-effects.js';
 
+const page = document.getElementById('game');
 const openButton = document.getElementById('open-button');
+const stage = document.getElementById('stage');
 const reveal = document.getElementById('reveal');
 const errorMessage = document.getElementById('config-error');
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 let tiers;
 try {
@@ -25,9 +30,41 @@ try {
   throw error; // Also log it to the console with a stack trace.
 }
 
-function showNextLute() {
-  const lute = openBox(Math.random, tiers);
-  renderLute(reveal.querySelector('[data-field="sprite"]'), lute.roll);
+// True from the click until the last reveal effect ends. Opens are ignored
+// meanwhile (Ryan to confirm in #7; the other option is skipping ahead).
+let opening = false;
+
+async function openNext() {
+  if (opening) return;
+  opening = true;
+  // aria-disabled rather than disabled: a disabled button drops keyboard
+  // focus, which would break pressing Space on it again.
+  openButton.setAttribute('aria-disabled', 'true');
+
+  try {
+    const lute = openBox(Math.random, tiers);
+    const plan = effectPlan(lute.tierId, { reducedMotion: reducedMotion.matches });
+
+    clearReveal();
+    await playAnticipation(stage, plan, lute.tierColor);
+
+    renderLute(stage, lute.roll);
+    showReveal(lute);
+    await playReveal(stage, page, plan, lute.tierColor);
+  } finally {
+    opening = false;
+    openButton.removeAttribute('aria-disabled');
+  }
+}
+
+function clearReveal() {
+  reveal.classList.add('pending');
+  for (const field of reveal.querySelectorAll('[data-field]')) {
+    field.textContent = '';
+  }
+}
+
+function showReveal(lute) {
   reveal.querySelector('[data-field="name"]').textContent = lute.name;
 
   const tier = reveal.querySelector('[data-field="tier"]');
@@ -38,10 +75,11 @@ function showNextLute() {
   odds.textContent = lute.oddsText;
   odds.title = lute.percentText;
 
+  reveal.classList.remove('pending');
   reveal.hidden = false;
 }
 
-openButton.addEventListener('click', showNextLute);
+openButton.addEventListener('click', openNext);
 
 document.addEventListener('keydown', (event) => {
   if (!isSpaceToOpen(event)) {
@@ -51,6 +89,6 @@ document.addEventListener('keydown', (event) => {
   // "clicking" itself on key release, which would open two boxes.
   event.preventDefault();
   if (!openButton.disabled) {
-    showNextLute();
+    openNext();
   }
 });

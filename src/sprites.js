@@ -21,6 +21,23 @@ export const PALETTE = {
   t: '#3a2414', // bridge
 };
 
+/** The unopened box, shown while it shakes before the reveal. */
+export const BOX_SPRITE = [
+  '.oooooooooooooo.',
+  'obbbbbbppbbbbbbo',
+  'obddddbppbddddbo',
+  'obbbbbbppbbbbbbo',
+  'oooooooooooooooo',
+  'obbbbboppobbbbbo',
+  'obddddossoddddbo',
+  'obbbbboppobbbbbo',
+  'obbbbboooobbbbbo',
+  'obddddbppbddddbo',
+  'obbbbbbppbbbbbbo',
+  'obddddbppbddddbo',
+  'oooooooooooooooo',
+];
+
 /** Base type id -> rows of pixels. */
 export const SPRITES = {
   'lute': [

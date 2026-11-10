@@ -1,0 +1,111 @@
+/* Anticipation and reveal effects (play-effects.js). Durations here must
+   match the constants there. None of this runs with reduced motion on:
+   effects.js gives an empty plan instead. */
+
+/* The box: shakes harder and glows brighter until it opens. */
+.box {
+  animation-name: box-shake;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes box-shake {
+  0% { transform: translate(0, 0); filter: drop-shadow(0 0 0 var(--tier-color)); }
+  10% { transform: translate(calc(var(--shake) * -0.3), 0); }
+  20% { transform: translate(calc(var(--shake) * 0.3), calc(var(--shake) * -0.2)); }
+  30% { transform: translate(calc(var(--shake) * -0.5), calc(var(--shake) * 0.2)); }
+  40% { transform: translate(calc(var(--shake) * 0.5), 0); }
+  50% { transform: translate(calc(var(--shake) * -0.7), calc(var(--shake) * -0.3)); }
+  60% { transform: translate(calc(var(--shake) * 0.7), calc(var(--shake) * 0.3)); }
+  70% { transform: translate(calc(var(--shake) * -0.85), 0); }
+  80% { transform: translate(calc(var(--shake) * 0.85), calc(var(--shake) * -0.4)); }
+  90% { transform: translate(calc(var(--shake) * -1), calc(var(--shake) * 0.4)); }
+  100% { transform: translate(var(--shake), 0); filter: drop-shadow(0 0 16px var(--tier-color)) drop-shadow(0 0 4px var(--tier-color)); }
+}
+
+/* Particles: square pixels flying out from the lute's center. */
+.particle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  pointer-events: none;
+  animation: particle-fly 900ms ease-out forwards;
+}
+
+@keyframes particle-fly {
+  from { transform: translate(0, 0) scale(1); opacity: 1; }
+  to { transform: translate(var(--dx), var(--dy)) scale(0.3); opacity: 0; }
+}
+
+/* Light beam: falls from above onto the lute, then fades. z-index -1 puts
+   it behind the page's text and button; the lute is positioned, so it
+   still draws on top. */
+.beam {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 140px;
+  height: 100vh;
+  margin-left: -70px;
+  z-index: -1;
+  pointer-events: none;
+  transform-origin: bottom center;
+  filter: blur(6px);
+  animation: beam 1600ms ease-out forwards;
+}
+
+.beam-light {
+  background: linear-gradient(to top, var(--tier-color), color-mix(in srgb, var(--tier-color) 40%, transparent) 60%, transparent);
+}
+
+.beam-rainbow {
+  background: linear-gradient(to right, #ff0040, #ff9900, #ffee00, #33ff66, #00ccff, #6644ff, #ff00cc);
+  /* Fade toward the top, like the plain beam. */
+  mask-image: linear-gradient(to top, #000, #000 40%, transparent);
+  -webkit-mask-image: linear-gradient(to top, #000, #000 40%, transparent);
+}
+
+@keyframes beam {
+  0% { opacity: 0; transform: scaleX(0.1); }
+  20% { opacity: 0.9; transform: scaleX(1); }
+  70% { opacity: 0.7; }
+  100% { opacity: 0; transform: scaleX(1.1); }
+}
+
+/* Screen flash: one soft pulse of the tier color. A single flash, well
+   under the three-per-second limit for flashing content. */
+.flash {
+  position: fixed;
+  inset: 0;
+  background: var(--tier-color);
+  pointer-events: none;
+  animation: flash 500ms ease-out forwards;
+}
+
+@keyframes flash {
+  0% { opacity: 0; }
+  20% { opacity: 0.5; }
+  100% { opacity: 0; }
+}
+
+/* Whole-page shake for the rarest tier. */
+.screen-shake {
+  animation: screen-shake 600ms linear;
+}
+
+@keyframes screen-shake {
+  0%, 100% { transform: translate(0, 0); }
+  15% { transform: translate(-8px, 4px); }
+  30% { transform: translate(7px, -5px); }
+  45% { transform: translate(-6px, -3px); }
+  60% { transform: translate(5px, 4px); }
+  75% { transform: translate(-3px, 2px); }
+  90% { transform: translate(2px, -1px); }
+}
+
+/* Reveal text fades in once the box opens. It stays in the page while
+   hidden so screen readers still announce the new lute. */
+#reveal.pending { opacity: 0; }
