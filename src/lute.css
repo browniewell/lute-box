@@ -16,21 +16,25 @@
   inset: 0;
   mask-size: 100% 100%;
   -webkit-mask-size: 100% 100%;
-  /* Fixed-width bands, so every lute shows the whole rainbow at any size. */
-  background: repeating-linear-gradient(
+  /* A 100px square tile, repeated. At 45°, two full rainbows across the
+     tile's diagonal line up exactly with the next tile on every side, so
+     there's no seam however wide the lute is. */
+  background: linear-gradient(
     45deg,
-    #ff0040 0, #ff9900 10px, #ffee00 20px, #33ff66 30px,
-    #00ccff 40px, #6644ff 50px, #ff00cc 60px, #ff0040 70px
-  );
+    #ff0040 0%, #ff9900 7.14%, #ffee00 14.29%, #33ff66 21.43%,
+    #00ccff 28.57%, #6644ff 35.71%, #ff00cc 42.86%, #ff0040 50%,
+    #ff9900 57.14%, #ffee00 64.29%, #33ff66 71.43%,
+    #00ccff 78.57%, #6644ff 85.71%, #ff00cc 92.86%, #ff0040 100%
+  ) 0 0 / 100px 100px;
   mix-blend-mode: color;
   opacity: 0.85;
   animation: holographic-shift 2s linear infinite;
 }
 
-/* At 45°, bands repeat every 70px × √2 ≈ 99px along x, so this loops seamlessly. */
+/* Sliding by exactly one tile loops back to the start without a jump. */
 @keyframes holographic-shift {
   from { background-position: 0 0; }
-  to { background-position: 98.99px 0; }
+  to { background-position: 100px 0; }
 }
 
 /* A four-point twinkle, drawn with two crossed bars. The dark gold edge
