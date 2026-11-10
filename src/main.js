@@ -31,7 +31,7 @@ try {
 }
 
 // True from the click until the last reveal effect ends. Opens are ignored
-// meanwhile (Ryan to confirm in #7; the other option is skipping ahead).
+// meanwhile, rather than skipping ahead (Ryan's call in #7).
 let opening = false;
 
 async function openNext() {

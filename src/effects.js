@@ -12,7 +12,7 @@
  */
 
 /**
- * Tier id -> effects. PROPOSAL, waiting on Ryan's approval in #7.
+ * Tier id -> effects. Approved by Ryan in #7.
  * Effects only ever grow from one tier to the next rarer one (the tests
  * check), and the rarest tier is the secret one, so it gets everything.
  *
