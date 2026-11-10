@@ -1,0 +1,63 @@
+/* Lute sprite and modifier effects, shared by index.html and preview.html. */
+
+.lute {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+.lute canvas {
+  /* Backup for any scaling the browser does: keep pixels square and sharp. */
+  image-rendering: pixelated;
+}
+
+.holographic {
+  position: absolute;
+  inset: 0;
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  /* A 100px square tile, repeated. At 45°, two full rainbows across the
+     tile's diagonal line up exactly with the next tile on every side, so
+     there's no seam however wide the lute is. */
+  background: linear-gradient(
+    45deg,
+    #ff0040 0%, #ff9900 7.14%, #ffee00 14.29%, #33ff66 21.43%,
+    #00ccff 28.57%, #6644ff 35.71%, #ff00cc 42.86%, #ff0040 50%,
+    #ff9900 57.14%, #ffee00 64.29%, #33ff66 71.43%,
+    #00ccff 78.57%, #6644ff 85.71%, #ff00cc 92.86%, #ff0040 100%
+  ) 0 0 / 100px 100px;
+  mix-blend-mode: color;
+  opacity: 0.85;
+  animation: holographic-shift 2s linear infinite;
+}
+
+/* Sliding by exactly one tile loops back to the start without a jump. */
+@keyframes holographic-shift {
+  from { background-position: 0 0; }
+  to { background-position: 100px 0; }
+}
+
+/* A four-point twinkle, drawn with two crossed bars. The dark gold edge
+   keeps it visible against gold wood and a light page. */
+.sparkle {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  background:
+    linear-gradient(#fffbe6, #fffbe6) center / 3px 100% no-repeat,
+    linear-gradient(#fffbe6, #fffbe6) center / 100% 3px no-repeat;
+  filter: drop-shadow(0 0 1px #7a5200) drop-shadow(0 0 1px #7a5200);
+  animation: twinkle 1.8s ease-in-out infinite;
+  opacity: 0;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.4); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .holographic, .sparkle { animation: none; }
+  .sparkle { opacity: 0.8; }
+}

@@ -8,7 +8,7 @@ import { CONFIG } from './config.js';
  * everything, misses included, because it answers "what fraction of pulls
  * are exactly this lute?", which is what tier targets need.
  *
- * Small enough to list in full: the placeholder config has about 5,800.
+ * Small enough to list in full: the placeholder config has 1,440.
  *
  * @param {import('./config.js').Config} [config]
  * @returns {{ roll: import('./roll.js').Roll, probability: number }[]}

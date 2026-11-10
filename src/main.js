@@ -1,11 +1,12 @@
 // Browser entry point. Keep game logic out of this file: anything here
 // touches the page, so it can't be unit tested in Node. The logic lives
-// in open-box.js and keyboard.js.
+// in open-box.js, keyboard.js and look.js.
 import { CONFIG } from './config.js';
 import { validateConfig } from './validate-config.js';
 import { computeTiers } from './tiers.js';
 import { openBox } from './open-box.js';
 import { isSpaceToOpen } from './keyboard.js';
+import { renderLute } from './render-lute.js';
 
 const openButton = document.getElementById('open-button');
 const reveal = document.getElementById('reveal');
@@ -26,6 +27,7 @@ try {
 
 function showNextLute() {
   const lute = openBox(Math.random, tiers);
+  renderLute(reveal.querySelector('[data-field="sprite"]'), lute.roll);
   reveal.querySelector('[data-field="name"]').textContent = lute.name;
 
   const tier = reveal.querySelector('[data-field="tier"]');
