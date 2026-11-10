@@ -1,6 +1,6 @@
 // Draws a lute with its modifiers into a page element. Browser only; the
 // decisions about what it should look like live in look.js.
-import { SPRITES, PALETTE } from './sprites.js';
+import { SPRITES, BOX_SPRITE, PALETTE } from './sprites.js';
 import { luteLook, sparklePoints } from './look.js';
 
 const SPARKLE_COUNT = 5;
@@ -46,6 +46,22 @@ export function renderLute(container, roll) {
   }
 
   container.replaceChildren(wrapper);
+}
+
+/**
+ * Replaces the contents of `container` with the unopened box and returns
+ * the box element, for play-effects.js to shake.
+ *
+ * @param {HTMLElement} container
+ * @param {number} pixelSize
+ * @returns {HTMLElement}
+ */
+export function renderBox(container, pixelSize) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'box';
+  wrapper.append(drawSprite(BOX_SPRITE, pixelSize));
+  container.replaceChildren(wrapper);
+  return wrapper;
 }
 
 // Draws each sprite pixel as a solid block. The canvas is sized in device

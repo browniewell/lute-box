@@ -9,6 +9,7 @@ import { formatOdds, formatPercent } from './format.js';
  * Everything the reveal shows for one opened box, as ready-to-display text.
  * @typedef {object} Reveal
  * @property {string} name e.g. "Crimson Jumbo Theorbo"
+ * @property {string} tierId
  * @property {string} tierName
  * @property {string} tierColor CSS color from the tier.
  * @property {string} oddsText e.g. "1 in 25,000"
@@ -31,6 +32,7 @@ export function openBox(random, tiers, config = CONFIG) {
   const tier = tierFor(odds, tiers);
   return {
     name: lootName(roll, config),
+    tierId: tier.id,
     tierName: tier.name,
     tierColor: tier.color,
     oddsText: formatOdds(odds),

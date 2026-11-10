@@ -16,6 +16,7 @@ test('a plain lute reveals as common with its odds', () => {
   const reveal = openBox(fixedRandom(0.1, 0.5), tiers, TINY_CONFIG);
   assert.deepEqual(reveal, {
     name: 'Lute',
+    tierId: 'common',
     tierName: 'Common',
     tierColor: '#9d9d9d',
     oddsText: '1 in 1',
