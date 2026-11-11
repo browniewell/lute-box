@@ -97,3 +97,14 @@ export function displayPixelSize(pixelSize, spriteHeight, { scale = 1, maxHeight
   const fits = Math.floor(maxHeight / spriteHeight);
   return Math.max(1, Math.min(scaled, fits));
 }
+
+/**
+ * How thick the black outline around a drawn lute (or box) is, in screen
+ * pixels: thin next to the sprite's pixels, but never thinner than 1px.
+ *
+ * @param {number} pixelSize Screen pixels per sprite pixel, as drawn.
+ * @returns {number}
+ */
+export function edgeWidth(pixelSize) {
+  return Math.max(1, Math.round(pixelSize / 3));
+}

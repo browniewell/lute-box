@@ -6,6 +6,18 @@
   line-height: 0;
 }
 
+/* A thin black outline around the whole sprite (pegs included), so it
+   reads on any background. Four offset shadows make a pixel-style edge.
+   It's on the wrapper, not the canvas, so modifier filters like negative
+   don't recolor it. render-lute.js sets --edge-width to suit the size. */
+.lute, .box canvas {
+  filter:
+    drop-shadow(var(--edge-width, 2px) 0 0 #000)
+    drop-shadow(calc(-1 * var(--edge-width, 2px)) 0 0 #000)
+    drop-shadow(0 var(--edge-width, 2px) 0 #000)
+    drop-shadow(0 calc(-1 * var(--edge-width, 2px)) 0 #000);
+}
+
 .lute canvas {
   /* Backup for any scaling the browser does: keep pixels square and sharp. */
   image-rendering: pixelated;
