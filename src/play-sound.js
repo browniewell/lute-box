@@ -19,11 +19,6 @@ let mix;
  * event handler, before any await.
  */
 export function unlockAudio() {
-  // On iPhone, Safari treats page sound as "ambient" by default, which the
-  // silent switch mutes. "playback" plays anyway, but iOS then pauses other
-  // apps' audio (Ryan chose that). Only Safari has navigator.audioSession;
-  // elsewhere this does nothing. Set before the context starts.
-  setAudioSessionType('playback');
   try {
     if (!context) {
       context = new AudioContext();
@@ -32,27 +27,6 @@ export function unlockAudio() {
     if (context.state === 'suspended') context.resume();
   } catch {
     context = undefined;
-  }
-}
-
-/**
- * Turning sound off: sleeps the audio context and hands the phone's audio
- * back, so a silent game doesn't keep other apps' music paused.
- */
-export function releaseAudio() {
-  setAudioSessionType('auto');
-  try {
-    context?.suspend();
-  } catch {
-    // Already closed or never started; nothing to release.
-  }
-}
-
-function setAudioSessionType(type) {
-  try {
-    if (navigator.audioSession) navigator.audioSession.type = type;
-  } catch {
-    // Not allowed right now; sound just follows the default rules.
   }
 }
 
