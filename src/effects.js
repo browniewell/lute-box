@@ -46,26 +46,20 @@ export function effectPlan(tierId, { reducedMotion }) {
 
 // How often the box changes direction while it rattles.
 const RATTLE_MS = 50;
-// Glow blur at full strength, px: a wide soft one and a tight bright one.
-const GLOW_WIDE = 16;
-const GLOW_TIGHT = 4;
 
 /**
- * Keyframes for the closed box before it opens (for element.animate): it
- * rattles side to side every RATTLE_MS, harder and harder up to `shake`
- * px, while a glow in the tier color grows around it.
- *
- * Built in JS rather than CSS so the rattle can be quick over any length
- * of anticipation, and so every frame has the same two shadows: Safari
- * can't animate between filter lists of different lengths, and jumps to
- * the end instead.
+ * Keyframes for the closed box rattling before it opens (for
+ * element.animate): side to side every RATTLE_MS, harder and harder up to
+ * `shake` px. Built in JS so the rattle stays quick over any length of
+ * anticipation. Its glow is a separate layer (play-effects.js) that fades
+ * in with opacity, because iPhone Safari doesn't animate a drop-shadow
+ * filter here and jumps straight to the end.
  *
  * @param {number} durationMs
  * @param {number} shake Most px the box moves, at the end.
- * @param {string} tierColor
- * @returns {{ offset: number, transform: string, filter: string }[]}
+ * @returns {{ offset: number, transform: string }[]}
  */
-export function boxShakeFrames(durationMs, shake, tierColor) {
+export function boxShakeFrames(durationMs, shake) {
   const count = Math.max(2, Math.round(durationMs / RATTLE_MS));
   return Array.from({ length: count + 1 }, (_, i) => {
     const progress = i / count;
@@ -73,12 +67,7 @@ export function boxShakeFrames(durationMs, shake, tierColor) {
     // Alternate left and right; bob up and down at half the rate.
     const x = i === 0 ? 0 : (i % 2 ? -1 : 1) * size;
     const y = i === 0 ? 0 : (i % 4 < 2 ? -0.4 : 0.4) * size;
-    const glow = (px) => `drop-shadow(0px 0px ${round(px * progress)}px ${tierColor})`;
-    return {
-      offset: progress,
-      transform: `translate(${round(x)}px, ${round(y)}px)`,
-      filter: `${glow(GLOW_WIDE)} ${glow(GLOW_TIGHT)}`,
-    };
+    return { offset: progress, transform: `translate(${round(x)}px, ${round(y)}px)` };
   });
 }
 

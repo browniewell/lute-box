@@ -24,10 +24,16 @@ export function playAnticipation(stage, plan, tierColor) {
   if (plan.anticipationMs === 0) return Promise.resolve();
 
   const box = renderBox(stage, BASE_PIXEL_SIZE);
-  box.animate(boxShakeFrames(plan.anticipationMs, plan.shake, tierColor), {
-    duration: plan.anticipationMs,
-    fill: 'forwards',
-  });
+  const timing = { duration: plan.anticipationMs, fill: 'forwards' };
+  box.animate(boxShakeFrames(plan.anticipationMs, plan.shake), timing);
+
+  // The glow: a layer in the tier color around the box that fades in.
+  // Opacity, not a filter, so it animates on iPhone Safari too.
+  const glow = document.createElement('div');
+  glow.className = 'box-glow';
+  glow.style.setProperty('--tier-color', tierColor);
+  box.prepend(glow);
+  glow.animate([{ opacity: 0 }, { opacity: 1 }], timing);
   return wait(plan.anticipationMs);
 }
 
