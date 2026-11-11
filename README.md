@@ -53,6 +53,14 @@ npm run simulate
 
 If the config is broken, the game shows the error on the page instead of rolling.
 
+## Share image and icons
+
+The link-preview image and the browser icons in `images/` are drawn from the game's own pixel art. After changing sprites or scenery, remake them (the tests fail until you do):
+
+```bash
+npm run images
+```
+
 ## Hosting
 
 The live game is served by GitHub Pages straight from the `main` branch, so merging to `main` updates it within a minute or two. There's no build step. The empty `.nojekyll` file tells Pages to serve the files as they are instead of running them through Jekyll.
