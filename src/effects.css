@@ -2,6 +2,17 @@
    match the constants there. None of this runs with reduced motion on:
    effects.js gives an empty plan instead. */
 
+/* The closed box's glow, faded in by play-effects.js. Its shadow sits
+   outside its own edges, so it never covers the box. */
+.box { position: relative; line-height: 0; } /* No gap under the canvas. */
+.box-glow {
+  position: absolute;
+  inset: 0;
+  box-shadow: 0 0 16px 4px var(--tier-color), 0 0 4px 1px var(--tier-color);
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* Particles: square pixels flying out from the lute's center. */
 .particle {
   position: absolute;

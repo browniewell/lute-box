@@ -47,8 +47,8 @@ test('an unknown tier fails loudly', () => {
   assert.throws(() => effectPlan('nope', { reducedMotion: false }), /nope/);
 });
 
-// boxShakeFrames: the box's rattle and glow before it opens.
-const frames = boxShakeFrames(1000, 6, '#ff8000');
+// boxShakeFrames: the box's rattle before it opens.
+const frames = boxShakeFrames(1000, 6);
 
 function translate(frame) {
   const [, x, y] = frame.transform.match(/translate\((-?[\d.]+)px, (-?[\d.]+)px\)/).map(Number);
@@ -69,15 +69,6 @@ test('the rattle starts still and grows, never past the tier shake', () => {
   const sizes = frames.map((frame) => Math.abs(translate(frame).x));
   for (const size of sizes) assert.ok(size <= 6);
   assert.ok(sizes.at(-2) > sizes[2], 'should shake harder near the end');
-});
-
-test('every frame has the same two glow shadows, so Safari can animate them', () => {
-  for (const frame of frames) {
-    assert.equal(frame.filter.match(/drop-shadow\(/g).length, 2, frame.filter);
-    assert.ok(frame.filter.includes('#ff8000'));
-  }
-  assert.match(frames[0].filter, /0px 0px 0px/);
-  assert.match(frames.at(-1).filter, /0px 0px 16px/);
 });
 
 test('frames run from the start to the end of the animation', () => {
