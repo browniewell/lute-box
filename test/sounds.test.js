@@ -27,12 +27,18 @@ test('the common sting is a single short, quiet, soft note', () => {
   assert.equal(common.length, 1);
   assert.ok(stingLength(common) <= 300, 'short');
   assert.ok(loudest(common) <= 0.5, 'quiet');
-  assert.equal(common[0].tone, 'soft');
 });
 
-test('only the two rarest tiers use the plucked-string tone', () => {
-  const plain = CONFIG.tiers.slice(0, -2).flatMap((tier) => TIER_STINGS[tier.id]);
-  assert.ok(plain.every((note) => note.tone === 'soft'));
+// Nothing should start with a hard edge: that's what made the plucked
+// strings sound alarming. Every note fades in, and chords swell slowly.
+test('every note fades in, and chord notes swell in gently', () => {
+  for (const [tierId, notes] of Object.entries(TIER_STINGS)) {
+    for (const note of notes) {
+      assert.ok(note.attackMs >= 5 && note.attackMs < note.lengthMs, `${tierId} attack`);
+    }
+  }
+  const chordNotes = TIER_STINGS.legendary.filter((note) => note.attackMs > 6);
+  assert.ok(chordNotes.length > 0 && chordNotes.every((note) => note.attackMs >= 40));
 });
 
 test('stings stay short and audible', () => {
@@ -42,7 +48,6 @@ test('stings stay short and audible', () => {
       assert.ok(note.frequency >= 100 && note.frequency <= 5000, `${tierId} frequency`);
       assert.ok(note.startMs >= 0 && note.lengthMs > 0, `${tierId} timing`);
       assert.ok(note.volume > 0 && note.volume <= 1, `${tierId} volume`);
-      assert.ok(['soft', 'string'].includes(note.tone), `${tierId} tone`);
     }
   }
 });

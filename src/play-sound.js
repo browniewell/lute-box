@@ -2,21 +2,16 @@
 // If the browser has no Web Audio, or blocks it, the game stays silent.
 //
 // Signal path for every note:
-//   soft tone or plucked strings -> pan -> mix -> dry + reverb -> compressor -> speakers
-import { pluckSamples, reverbImpulse } from './synth.js';
+//   soft tone -> pan -> mix -> dry + reverb -> compressor -> speakers
+import { reverbImpulse } from './synth.js';
 
 const VOLUME = 0.6; // Overall level. Each note's own volume scales from here.
 const REVERB_MIX = 0.18; // How much room to add. 0 is dry.
-// Lutes have paired strings for each note, tuned a hair apart. The slow
-// beating between the two is a big part of the lute's warm sound.
-const PAIR_DETUNE = 1.0025; // About 4 cents sharp.
 
 /** @type {AudioContext | undefined} */
 let context;
 /** @type {AudioNode | undefined} */
 let mix;
-// Rendering a pluck takes a few ms, so each one is made once and reused.
-const plucks = new Map();
 
 /**
  * Creates or wakes the audio context. Browsers (iOS Safari above all) only
@@ -48,67 +43,32 @@ export function playSting(notes) {
   }
 }
 
-function playNote(note, at) {
-  // Melody notes spread a little, lower ones left and higher ones right,
-  // centered between C5 and C6. Bass notes stay in the middle.
-  const { frequency } = note;
+// A rounded mallet tone: a pure sine with a faint octave on top that fades
+// fast, giving a gentle "tok" and nothing sharp. Melody notes spread a
+// little, lower ones left and higher ones right, centered between C5 and
+// C6; bass notes stay in the middle.
+function playNote({ frequency, lengthMs, volume, attackMs }, at) {
   const pan = context.createStereoPanner();
   pan.pan.value = frequency < 500 ? 0 : Math.max(-0.5, Math.min(0.5, Math.log2(frequency / 740) * 0.25));
   pan.connect(mix);
 
-  if (note.tone === 'string') {
-    playStrings(note, at, pan);
-  } else {
-    playSoft(note, at, pan);
-  }
-}
-
-// A rounded mallet tone: a pure sine with a faint octave on top that
-// fades fast, giving a gentle "tok" at the start and nothing sharp.
-function playSoft({ frequency, lengthMs, volume }, at, output) {
+  const peak = at + attackMs / 1000;
   const end = at + lengthMs / 1000;
-  for (const [multiple, level, decay] of [[1, 1, end], [2, 0.15, at + 0.06]]) {
+  for (const [multiple, level, fadeEnd] of [[1, 1, end], [2, 0.15, peak + 0.06]]) {
     const oscillator = context.createOscillator();
     oscillator.frequency.value = frequency * multiple;
     const envelope = context.createGain();
-    // A 6 ms rise instead of an instant start, so there's no click.
     envelope.gain.setValueAtTime(0, at);
-    envelope.gain.linearRampToValueAtTime(volume * level, at + 0.006);
-    envelope.gain.exponentialRampToValueAtTime(0.0001, decay);
-    oscillator.connect(envelope).connect(output);
+    envelope.gain.linearRampToValueAtTime(volume * level, peak);
+    envelope.gain.exponentialRampToValueAtTime(0.0001, fadeEnd);
+    oscillator.connect(envelope).connect(pan);
     oscillator.start(at);
     oscillator.stop(end + 0.05);
   }
 }
 
-function playStrings({ frequency, lengthMs, volume }, at, output) {
-  const gain = context.createGain();
-  gain.gain.value = volume * 0.5; // Two strings per note.
-  gain.connect(output);
-  for (const [string, rate] of [[0, 1], [1, PAIR_DETUNE]]) {
-    const source = context.createBufferSource();
-    source.buffer = pluckBuffer(frequency, lengthMs, string);
-    source.playbackRate.value = rate;
-    source.connect(gain);
-    source.start(at);
-  }
-}
-
-// `string` picks one of the pair: each has its own noise burst, so the two
-// don't sound like one note copied.
-function pluckBuffer(frequency, lengthMs, string) {
-  const key = `${frequency}/${lengthMs}/${string}`;
-  if (!plucks.has(key)) {
-    const samples = pluckSamples(frequency, context.sampleRate, lengthMs, Math.random);
-    const buffer = context.createBuffer(1, samples.length, context.sampleRate);
-    buffer.copyToChannel(samples, 0);
-    plucks.set(key, buffer);
-  }
-  return plucks.get(key);
-}
-
 // Notes go into the returned node. It splits into a dry path and a reverb
-// path, and both meet at a compressor so big chords don't clip.
+// path, and both meet at a compressor so chords don't clip.
 function buildMix(ctx) {
   const input = ctx.createGain();
 

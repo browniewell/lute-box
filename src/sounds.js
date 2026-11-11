@@ -4,8 +4,8 @@
 //
 // These are earcons: short, soft UI sounds, not music. Common plays on
 // most pulls, so it's one quiet, rounded note that stays out of the way.
-// Each rarer tier adds a note and a little volume. Only the two rarest
-// end on a strummed lute chord, as a reward.
+// Each rarer tier adds a note and a little volume. The two rarest end on
+// a chord that swells in gently, as a reward, rather than being struck.
 
 /**
  * @typedef {object} Note
@@ -13,29 +13,32 @@
  * @property {number} startMs From the start of the sting.
  * @property {number} lengthMs How long it rings before fading out.
  * @property {number} volume 0 to 1.
- * @property {'soft' | 'string'} tone soft: a rounded mallet tone.
- *   string: a plucked lute string (synth.js).
+ * @property {number} attackMs How long it takes to reach full volume.
+ *   Short (a soft "tok") for melody notes, longer (a swell) for chords.
  */
 
 // C major pentatonic, so any of these sound fine together.
 const PITCH = {
-  C3: 130.81, C4: 261.63, G4: 392,
+  C4: 261.63, G4: 392,
   C5: 523.25, E5: 659.25, G5: 783.99, A5: 880, C6: 1046.5,
 };
 
 const STEP_MS = 80; // Gap between notes in a run.
-const STRUM_MS = 35; // Gap between strings in a strummed chord.
+const ROLL_MS = 60; // Gap between chord notes, low to high: a gentle roll.
+const NOTE_ATTACK_MS = 6; // Fast enough to sound like a tap, slow enough not to click.
+const CHORD_ATTACK_MS = 60; // Chord notes bloom in instead of hitting.
+const CHORD_VOLUME = 0.35; // Each chord note. Several overlap, so keep them low.
 
-// A rising run of soft notes, then (optionally) a chord strummed low to
-// high on lute strings.
+// A rising run of soft notes, then (optionally) a chord that swells in.
 function sting({ run, noteMs, volume, chord = [], chordMs = 0 }) {
   const notes = run.map((pitch, i) => ({
-    frequency: PITCH[pitch], startMs: i * STEP_MS, lengthMs: noteMs, volume, tone: 'soft',
+    frequency: PITCH[pitch], startMs: i * STEP_MS, lengthMs: noteMs, volume, attackMs: NOTE_ATTACK_MS,
   }));
   const chordStart = run.length * STEP_MS;
   chord.forEach((pitch, i) => {
     notes.push({
-      frequency: PITCH[pitch], startMs: chordStart + i * STRUM_MS, lengthMs: chordMs, volume: 0.6, tone: 'string',
+      frequency: PITCH[pitch], startMs: chordStart + i * ROLL_MS, lengthMs: chordMs,
+      volume: CHORD_VOLUME, attackMs: CHORD_ATTACK_MS,
     });
   });
   return notes;
@@ -54,11 +57,11 @@ export const TIER_STINGS = {
   epic: sting({ run: ['C5', 'E5', 'G5', 'C6'], noteMs: 360, volume: 0.65 }),
   legendary: sting({
     run: ['C5', 'E5', 'G5', 'C6'], noteMs: 360, volume: 0.7,
-    chord: ['C3', 'G4', 'C5', 'E5', 'G5'], chordMs: 900,
+    chord: ['C4', 'G4', 'C5', 'E5'], chordMs: 900,
   }),
   mythic: sting({
     run: ['C5', 'E5', 'G5', 'A5', 'C6'], noteMs: 400, volume: 0.75,
-    chord: ['C3', 'C4', 'G4', 'C5', 'E5', 'G5', 'C6'], chordMs: 1200,
+    chord: ['C4', 'G4', 'C5', 'E5', 'G5', 'C6'], chordMs: 1200,
   }),
 };
 
