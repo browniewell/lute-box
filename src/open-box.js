@@ -12,6 +12,7 @@ import { formatOdds, formatPercent } from './format.js';
  * @property {string} tierId
  * @property {string} tierName
  * @property {string} tierColor CSS color from the tier.
+ * @property {number} odds Exact odds, 0 to 1. The trophy case sorts by this.
  * @property {string} oddsText e.g. "1 in 25,000"
  * @property {string} percentText e.g. "0.004%", shown on hover.
  * @property {import('./roll.js').Roll} roll For drawing the sprite.
@@ -35,6 +36,7 @@ export function openBox(random, tiers, config = CONFIG) {
     tierId: tier.id,
     tierName: tier.name,
     tierColor: tier.color,
+    odds,
     oddsText: formatOdds(odds),
     percentText: formatPercent(odds),
     roll,

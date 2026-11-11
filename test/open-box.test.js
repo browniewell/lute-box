@@ -19,6 +19,7 @@ test('a plain lute reveals as common with its odds', () => {
     tierId: 'common',
     tierName: 'Common',
     tierColor: '#9d9d9d',
+    odds: 0.9,
     oddsText: '1 in 1',
     percentText: '90%',
     roll: { baseType: 'lute', groups: {}, modifiers: [] },

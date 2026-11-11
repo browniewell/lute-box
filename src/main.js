@@ -1,6 +1,6 @@
 // Browser entry point. Keep game logic out of this file: anything here
 // touches the page, so it can't be unit tested in Node. The logic lives
-// in open-box.js, keyboard.js, look.js and effects.js.
+// in open-box.js, keyboard.js, look.js, effects.js and records.js.
 import { CONFIG } from './config.js';
 import { validateConfig } from './validate-config.js';
 import { computeTiers } from './tiers.js';
@@ -9,12 +9,18 @@ import { isSpaceToOpen } from './keyboard.js';
 import { renderLute } from './render-lute.js';
 import { effectPlan } from './effects.js';
 import { playAnticipation, playReveal } from './play-effects.js';
+import { emptyRecords, addPull } from './records.js';
+import { loadRecords, saveRecords, clearRecords } from './storage.js';
+import { renderRecords } from './render-records.js';
 
 const page = document.getElementById('game');
 const openButton = document.getElementById('open-button');
 const stage = document.getElementById('stage');
 const reveal = document.getElementById('reveal');
 const errorMessage = document.getElementById('config-error');
+const recordsSection = document.getElementById('records');
+const storageNote = document.getElementById('storage-note');
+const resetButton = document.getElementById('reset-button');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 let tiers;
@@ -30,6 +36,19 @@ try {
   throw error; // Also log it to the console with a stack trace.
 }
 
+const STORAGE_NOTES = {
+  unavailable: "This browser isn't letting the game save, so trophies and stats last only until you leave the page.",
+  corrupt: "Saved trophies and stats couldn't be read, so they're starting fresh.",
+  saveFailed: "Couldn't save this pull. Trophies and stats may not be kept after you leave the page.",
+};
+
+// If storage can't be used, the game still plays; it just doesn't save.
+const saved = loadRecords(() => window.localStorage);
+const storage = saved.storage;
+let records = saved.records;
+if (saved.problem) showStorageNote(saved.problem);
+renderRecords(recordsSection, records, tiers);
+
 // True from the click until the last reveal effect ends. Opens are ignored
 // meanwhile, rather than skipping ahead (Ryan's call in #7).
 let opening = false;
@@ -43,6 +62,11 @@ async function openNext() {
 
   try {
     const lute = openBox(Math.random, tiers);
+    // Saved straight away, so leaving mid-animation doesn't lose the pull.
+    // The page shows it at the reveal, so the trophy case can't spoil it.
+    records = addPull(records, lute, new Date());
+    if (storage && !saveRecords(storage, records)) showStorageNote('saveFailed');
+
     const plan = effectPlan(lute.tierId, { reducedMotion: reducedMotion.matches });
 
     clearReveal();
@@ -50,6 +74,7 @@ async function openNext() {
 
     renderLute(stage, lute.roll);
     showReveal(lute);
+    renderRecords(recordsSection, records, tiers);
     await playReveal(stage, page, plan, lute.tierColor);
   } finally {
     opening = false;
@@ -79,7 +104,21 @@ function showReveal(lute) {
   reveal.hidden = false;
 }
 
+function showStorageNote(problem) {
+  storageNote.textContent = STORAGE_NOTES[problem];
+  storageNote.hidden = false;
+}
+
 openButton.addEventListener('click', openNext);
+
+resetButton.addEventListener('click', () => {
+  // Ignored mid-open, so a pull being revealed can't be wiped half-saved.
+  if (opening) return;
+  if (!window.confirm("Erase your trophy case and all stats? This can't be undone.")) return;
+  records = emptyRecords();
+  if (storage) clearRecords(storage);
+  renderRecords(recordsSection, records, tiers);
+});
 
 document.addEventListener('keydown', (event) => {
   if (!isSpaceToOpen(event)) {
