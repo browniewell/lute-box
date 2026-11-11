@@ -77,7 +77,7 @@ export const TIER_STINGS = {
   }),
   mythic: sting({
     run: ['C5', 'E5', 'G5', 'A5', 'C6', 'E6'], noteMs: 400, volume: 0.8,
-    chord: ['C3', 'C4', 'G4', 'C5', 'E5', 'G5', 'C6'], chordMs: 1100,
+    chord: ['C3', 'C4', 'G4', 'C5', 'E5', 'G5', 'C6'], chordMs: 1800,
     twinkle: ['E6', 'G6', 'C7'],
   }),
 };

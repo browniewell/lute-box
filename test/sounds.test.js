@@ -34,6 +34,7 @@ test('the common sting is short and quiet', () => {
 test('the rarest tier stands out from the next one down', () => {
   const [below, rarest] = CONFIG.tiers.slice(-2).map((tier) => TIER_STINGS[tier.id]);
   assert.ok(rarest.length >= below.length + 4, 'several more notes');
+  assert.ok(stingLength(rarest) >= stingLength(below) + 500, 'rings at least half a second longer');
   assert.ok(Math.max(...rarest.map((n) => n.frequency)) > Math.max(...below.map((n) => n.frequency)), 'reaches higher');
   assert.ok(Math.min(...rarest.map((n) => n.frequency)) < Math.min(...below.map((n) => n.frequency)), 'reaches lower');
 });
@@ -52,7 +53,9 @@ test('every note fades in, and chord notes swell in gently', () => {
 
 test('stings stay short and audible', () => {
   for (const [tierId, notes] of Object.entries(TIER_STINGS)) {
-    assert.ok(stingLength(notes) <= 2000, `${tierId} is over 2 seconds`);
+    // The rarest tier gets a longer finish (Ryan, #20); the rest stay snappy.
+    const limit = tierId === CONFIG.tiers.at(-1).id ? 3000 : 2000;
+    assert.ok(stingLength(notes) <= limit, `${tierId} is over ${limit / 1000} seconds`);
     for (const note of notes) {
       assert.ok(note.frequency >= 100 && note.frequency <= 5000, `${tierId} frequency`);
       assert.ok(note.startMs >= 0 && note.lengthMs > 0, `${tierId} timing`);
