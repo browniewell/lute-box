@@ -4,70 +4,73 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lute Box</title>
+  <link rel="stylesheet" href="src/tavern.css">
   <link rel="stylesheet" href="src/lute.css">
   <link rel="stylesheet" href="src/effects.css">
-  <style>
-    /* Basic readability only; real styling comes in a later milestone. */
-    body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
-    button { font-size: 1.25rem; padding: 0.5rem 1.5rem; }
-    /* Room for an upside-down jumbo theorbo without the page jumping much. */
-    #stage { position: relative; min-height: 12rem; display: flex; align-items: center; margin-top: 1.5rem;
-      /* As wide as the lute, so effects placed at 50% center on it. */
-      width: fit-content; }
-    /* A clear focus ring on everything, for keyboard players. */
-    :focus-visible { outline: 3px solid #0070dd; outline-offset: 3px; }
-    [data-field="odds"], .trophy .odds { text-decoration: underline dotted; cursor: help; }
-    #records { margin-top: 3rem; }
-    #records dt { font-weight: bold; }
-    #records dd { margin: 0 0 0.5rem; }
-    #trophies { padding-left: 1.5rem; }
-    .trophy { margin-bottom: 1rem; }
-    .trophy > * { display: inline-block; vertical-align: middle; }
-    /* Sprites at half size, in a fixed-width column so the text lines up. */
-    .trophy-sprite { zoom: 0.5; width: 12rem; margin-right: 1rem; text-align: center; }
-  </style>
 </head>
 <body>
-<main id="game">
-  <h1>Lute Box</h1>
+<!-- data-tab picks the panel shown on a phone; on wider screens all show. -->
+<main id="game" data-tab="play">
+  <header class="sign-row">
+    <span class="lantern" aria-hidden="true"></span>
+    <!-- The sign is drawn in pixels; the heading text is for screen readers. -->
+    <h1><span class="visually-hidden">Lute Box</span><span id="sign" aria-hidden="true"></span></h1>
+    <span class="lantern" aria-hidden="true"></span>
+  </header>
 
-  <p id="config-error" role="alert" hidden></p>
+  <div id="play" class="panel">
+    <p id="config-error" role="alert" hidden></p>
 
-  <button id="open-button" type="button">Open</button>
-  <!-- aria-pressed says on/off to screen readers; the word shows it on screen. -->
-  <button id="sound-button" type="button" aria-pressed="false">Sound: <span data-sound-state aria-hidden="true">off</span></button>
-  <p><small>or press Space</small></p>
+    <div class="controls">
+      <button id="open-button" type="button">Open</button>
+      <!-- aria-pressed says on/off to screen readers; the word shows it on screen. -->
+      <button id="sound-button" type="button" aria-pressed="false">Sound: <span data-sound-state aria-hidden="true">off</span></button>
+      <small class="hint">or press Space</small>
+    </div>
 
-  <!-- The box, then the lute. Decoration: the name below says which lute it is. -->
-  <div id="stage" aria-hidden="true"></div>
+    <!-- The box, then the lute. Decoration: the name below says which lute it is. -->
+    <div id="stage" aria-hidden="true"></div>
+    <div class="counter" aria-hidden="true"></div>
 
-  <!-- aria-live reads each new lute aloud to screen readers. It's in the
-       page from the start (not hidden), because some screen readers skip
-       a live region's first update if it only just appeared. -->
-  <div id="reveal" class="pending" aria-live="polite">
-    <p><strong data-field="name"></strong></p>
-    <p>Tier: <span data-field="tier"></span></p>
-    <p>Odds: <span data-field="odds"></span></p>
+    <!-- aria-live reads each new lute aloud to screen readers. It's in the
+         page from the start (not hidden), because some screen readers skip
+         a live region's first update if it only just appeared. -->
+    <div id="reveal" class="pending" aria-live="polite">
+      <p><strong data-field="name"></strong></p>
+      <p>Tier: <span data-field="tier"></span></p>
+      <p>Odds: <span data-field="odds"></span></p>
+    </div>
   </div>
 
-  <section id="records">
-    <h2>Stats</h2>
-    <p id="storage-note" role="status" hidden></p>
-    <dl>
-      <dt>Boxes opened</dt><dd data-stat="opened"></dd>
-      <dt>Best pull ever</dt><dd data-stat="best"></dd>
-      <dt>Rarest modifier found</dt><dd data-stat="modifier"></dd>
-      <dt>Pulls per tier</dt><dd><ul id="tier-counts"></ul></dd>
-    </dl>
+  <!-- Both record panels, so the phone's Trophies tab can show them together. -->
+  <div id="records">
+    <section id="trophy-case" class="panel" aria-labelledby="trophy-heading">
+      <div class="panel-head">
+        <h2 id="trophy-heading">Trophy case</h2>
+        <small>Your 10 rarest lutes ever</small>
+      </div>
+      <p id="trophies-empty" class="note">Open a box to start your collection.</p>
+      <ol id="trophies"></ol>
+    </section>
 
-    <h2>Trophy case</h2>
-    <p><small>Your 10 rarest lutes ever.</small></p>
-    <p id="trophies-empty">Open a box to start your collection.</p>
-    <ol id="trophies"></ol>
+    <section id="stats" class="panel" aria-labelledby="stats-heading">
+      <h2 id="stats-heading">Stats</h2>
+      <p id="storage-note" class="note" role="status" hidden></p>
+      <dl>
+        <div><dt>Boxes opened</dt><dd data-stat="opened"></dd></div>
+        <div><dt>Best pull ever</dt><dd data-stat="best"></dd></div>
+        <div><dt>Rarest modifier</dt><dd data-stat="modifier"></dd></div>
+        <div class="wide"><dt>Pulls per tier</dt><dd><ul id="tier-counts"></ul></dd></div>
+      </dl>
+      <button id="reset-button" type="button">Reset trophies and stats</button>
+    </section>
+  </div>
 
-    <button id="reset-button" type="button">Reset trophies and stats</button>
-  </section>
-
+  <!-- Phone only (hidden by tavern.css on wider screens). -->
+  <div class="tabs" role="tablist" aria-label="Lute Box">
+    <button id="tab-play" type="button" role="tab" data-tab="play" aria-controls="play" aria-selected="true">Play</button>
+    <button id="tab-trophies" type="button" role="tab" data-tab="trophies" aria-controls="records" aria-selected="false" tabindex="-1">Trophies</button>
+  </div>
 </main>
 
   <!-- type="module" lets the page and the Node tests share the same files in src/. -->

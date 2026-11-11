@@ -4,7 +4,8 @@ import { renderLute } from './render-lute.js';
 import { formatOdds, formatPercent } from './format.js';
 
 /**
- * @param {HTMLElement} section The #records section in index.html.
+ * @param {HTMLElement} section The page element holding the stats and
+ *   trophy case (#records in index.html).
  * @param {import('./records.js').Records} records
  * @param {import('./tiers.js').ComputedTier[]} tiers
  */
@@ -29,14 +30,23 @@ export function renderRecords(section, records, tiers) {
   );
 
   section.querySelector('#trophies-empty').hidden = records.trophies.length > 0;
-  section.querySelector('#trophies').replaceChildren(...records.trophies.map(trophyItem));
+  // Today's tier colors, so trophies saved before a color change still
+  // match the rest of the page. Falls back to the saved one.
+  const colors = Object.fromEntries(tiers.map((tier) => [tier.id, tier.color]));
+  section.querySelector('#trophies').replaceChildren(
+    ...records.trophies.map((trophy) => trophyItem(trophy, colors[trophy.tierId] ?? trophy.tierColor)),
+  );
 }
 
 function setStat(section, key, text) {
   section.querySelector(`[data-stat="${key}"]`).textContent = text;
 }
 
-function trophyItem(trophy) {
+// Trophy sprites are a third of full size (so jumbo still looks bigger), and
+// shrink further to fit the shelf; .trophy-sprite in tavern.css matches.
+const TROPHY_SIZE = { scale: 1 / 3, maxHeight: 56 };
+
+function trophyItem(trophy, tierColor) {
   const item = document.createElement('li');
   item.className = 'trophy';
 
@@ -44,7 +54,7 @@ function trophyItem(trophy) {
   sprite.className = 'trophy-sprite';
   sprite.setAttribute('aria-hidden', 'true');
   try {
-    renderLute(sprite, trophy.roll);
+    renderLute(sprite, trophy.roll, TROPHY_SIZE);
   } catch {
     // A saved roll the current config can't draw (e.g. a removed base
     // type). The text below still says what it was.
@@ -55,7 +65,7 @@ function trophyItem(trophy) {
 
   const tier = document.createElement('span');
   tier.textContent = trophy.tierName;
-  tier.style.color = trophy.tierColor;
+  tier.style.color = tierColor;
 
   const odds = document.createElement('span');
   odds.className = 'odds';
@@ -67,7 +77,7 @@ function trophyItem(trophy) {
   date.textContent = new Date(trophy.pulledAt).toLocaleDateString();
 
   const details = document.createElement('div');
-  details.append(name, document.createElement('br'), tier, ' · ', odds, ' · ', date);
+  details.append(name, tier, ' · ', odds, date);
   item.append(sprite, details);
   return item;
 }

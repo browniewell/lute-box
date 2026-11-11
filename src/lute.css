@@ -41,12 +41,13 @@
    keeps it visible against gold wood and a light page. */
 .sparkle {
   position: absolute;
-  width: 16px;
-  height: 16px;
-  margin: -8px 0 0 -8px;
+  /* render-lute.js sets a smaller size for small lutes. */
+  width: var(--sparkle-size, 16px);
+  height: var(--sparkle-size, 16px);
+  margin: calc(var(--sparkle-size, 16px) / -2) 0 0 calc(var(--sparkle-size, 16px) / -2);
   background:
-    linear-gradient(#fffbe6, #fffbe6) center / 3px 100% no-repeat,
-    linear-gradient(#fffbe6, #fffbe6) center / 100% 3px no-repeat;
+    linear-gradient(#fffbe6, #fffbe6) center / max(2px, 18%) 100% no-repeat,
+    linear-gradient(#fffbe6, #fffbe6) center / 100% max(2px, 18%) no-repeat;
   filter: drop-shadow(0 0 1px #7a5200) drop-shadow(0 0 1px #7a5200);
   animation: twinkle 1.8s ease-in-out infinite;
   opacity: 0;

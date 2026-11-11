@@ -1,9 +1,10 @@
 // Draws a lute with its modifiers into a page element. Browser only; the
 // decisions about what it should look like live in look.js.
 import { SPRITES, BOX_SPRITE, PALETTE } from './sprites.js';
-import { luteLook, sparklePoints } from './look.js';
+import { luteLook, sparklePoints, displayPixelSize, BASE_PIXEL_SIZE } from './look.js';
 
 const SPARKLE_COUNT = 5;
+const SPARKLE_SIZE = 16; // px at full size; matches .sparkle in lute.css.
 
 /**
  * Replaces the contents of `container` with the lute for `roll`.
@@ -11,16 +12,19 @@ const SPARKLE_COUNT = 5;
  *
  * @param {HTMLElement} container
  * @param {import('./roll.js').Roll} roll
+ * @param {{ scale?: number, maxHeight?: number }} [size] See displayPixelSize
+ *   in look.js. Leave out for full size.
  */
-export function renderLute(container, roll) {
+export function renderLute(container, roll, size = {}) {
   const sprite = SPRITES[roll.baseType];
   const look = luteLook(roll);
+  const pixelSize = displayPixelSize(look.pixelSize, sprite.length, size);
 
   const wrapper = document.createElement('div');
   wrapper.className = 'lute';
   wrapper.style.transform = `rotate(${look.rotation}deg)`;
 
-  const canvas = drawSprite(sprite, look.pixelSize);
+  const canvas = drawSprite(sprite, pixelSize);
   canvas.style.filter = look.filter;
   wrapper.append(canvas);
 
@@ -35,11 +39,14 @@ export function renderLute(container, roll) {
   }
 
   if (look.sparkle) {
+    // Sparkles shrink with the lute, so a small trophy isn't all sparkle.
+    const sparkleSize = Math.max(6, Math.round((SPARKLE_SIZE * pixelSize) / BASE_PIXEL_SIZE));
+    wrapper.style.setProperty('--sparkle-size', `${sparkleSize}px`);
     sparklePoints(sprite, SPARKLE_COUNT).forEach(({ x, y }, i) => {
       const sparkle = document.createElement('span');
       sparkle.className = 'sparkle';
-      sparkle.style.left = `${(x + 0.5) * look.pixelSize}px`;
-      sparkle.style.top = `${(y + 0.5) * look.pixelSize}px`;
+      sparkle.style.left = `${(x + 0.5) * pixelSize}px`;
+      sparkle.style.top = `${(y + 0.5) * pixelSize}px`;
       sparkle.style.animationDelay = `${i * 0.37}s`;
       wrapper.append(sparkle);
     });
@@ -66,8 +73,9 @@ export function renderBox(container, pixelSize) {
 
 // Draws each sprite pixel as a solid block. The canvas is sized in device
 // pixels, so on a Retina screen every block lands on whole screen pixels
-// and nothing gets smoothed or blurred.
-function drawSprite(sprite, pixelSize) {
+// and nothing gets smoothed or blurred. Also draws the scenery
+// (render-scenery.js), which has its own palette.
+export function drawSprite(sprite, pixelSize, palette = PALETTE) {
   const ratio = window.devicePixelRatio || 1;
   const block = Math.round(pixelSize * ratio);
   const width = sprite[0].length;
@@ -83,7 +91,7 @@ function drawSprite(sprite, pixelSize) {
   sprite.forEach((row, y) => {
     [...row].forEach((char, x) => {
       if (char === '.') return;
-      context.fillStyle = PALETTE[char];
+      context.fillStyle = palette[char];
       context.fillRect(x * block, y * block, block, block);
     });
   });
