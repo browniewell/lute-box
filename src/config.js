@@ -46,7 +46,6 @@
  * @property {Group[]} groups
  * @property {Option[]} independentModifiers
  * @property {Tier[]} tiers
- * @property {number} nearMissMargin How close counts as "so close", from 0 to 1.
  */
 
 /** @type {Config} */
@@ -108,10 +107,4 @@ export const CONFIG = {
     // Color is a PLACEHOLDER: the handoff only sets gray through orange.
     { id: 'mythic', name: 'Mythic', color: '#ff2a6d', targetShare: 0.001 }, // PLACEHOLDER
   ],
-
-  // A "so close" callout shows when a lute lands just short of the next
-  // tier. 0.1 means within 10% in "1 in N" terms: 1 in 91 against a
-  // threshold of 1 in 100 counts. 0 turns the callout off. With the
-  // placeholder odds, 0.1 shows it on about 4% of pulls.
-  nearMissMargin: 0.1, // PLACEHOLDER: Ryan decides "just under" (#9)
 };

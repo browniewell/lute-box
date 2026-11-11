@@ -10,7 +10,6 @@ import { validateConfig } from '../src/validate-config.js';
 import { computeTiers, tierFor } from '../src/tiers.js';
 import { rollLute } from '../src/roll.js';
 import { exactOdds } from '../src/odds.js';
-import { nearMiss } from '../src/near-miss.js';
 import { lootName } from '../src/names.js';
 import { createSeededRandom } from '../src/random.js';
 import { formatOdds, formatPercent } from '../src/format.js';
@@ -24,13 +23,11 @@ const tiers = computeTiers(CONFIG);
 const random = createSeededRandom(seed);
 const tierCounts = Object.fromEntries(tiers.map((tier) => [tier.id, 0]));
 let rarest = null;
-let nearMisses = 0;
 
 for (let i = 1; i <= count; i++) {
   const roll = rollLute(random);
   const odds = exactOdds(roll);
   tierCounts[tierFor(odds, tiers).id]++;
-  if (nearMiss(odds, tiers, CONFIG.nearMissMargin)) nearMisses++;
   if (!rarest || odds < rarest.odds) {
     rarest = { roll, odds, boxNumber: i };
   }
@@ -41,10 +38,6 @@ printTierTable();
 console.log(
   `\nRarest pull: ${lootName(rarest.roll)}, ${formatOdds(rarest.odds)}, ` +
     `${tierFor(rarest.odds, tiers).name} (box #${rarest.boxNumber.toLocaleString('en-US')})`,
-);
-console.log(
-  `"So close" callouts: ${formatPercent(nearMisses / count)} of pulls ` +
-    `(nearMissMargin ${CONFIG.nearMissMargin})`,
 );
 
 function printTierTable() {

@@ -110,13 +110,6 @@ function showReveal(lute) {
   odds.textContent = lute.oddsText;
   odds.title = lute.percentText;
 
-  // Words, not just color, so it reads the same without color vision.
-  const nearMiss = reveal.querySelector('[data-field="near-miss"]');
-  if (lute.nearMiss) {
-    nearMiss.textContent = `So close! Almost ${lute.nearMiss.tierName}.`;
-    nearMiss.style.color = lute.nearMiss.tierColor;
-  }
-
   reveal.classList.remove('pending');
 }
 

@@ -22,7 +22,6 @@ test('a plain lute reveals as common with its odds', () => {
     odds: 0.9,
     oddsText: '1 in 1',
     percentText: '90%',
-    nearMiss: null,
     roll: { baseType: 'lute', groups: {}, modifiers: [] },
   });
 });

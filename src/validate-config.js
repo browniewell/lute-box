@@ -30,11 +30,6 @@ export function validateConfig(config) {
       );
     }
   }
-
-  const margin = config.nearMissMargin;
-  if (!(typeof margin === 'number' && margin >= 0 && margin < 1)) {
-    throw new Error(`Near miss margin must be from 0 up to (not including) 1, got ${margin}`);
-  }
 }
 
 function checkSumsToOne(label, items) {

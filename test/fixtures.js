@@ -36,7 +36,6 @@ export const TEST_CONFIG = {
     { id: 'rare', name: 'Rare', color: '#0070dd', targetShare: 0.25 },
     { id: 'legendary', name: 'Legendary', color: '#ff8000', targetShare: 0.05 },
   ],
-  nearMissMargin: 0.1,
 };
 
 // A config small enough to work out tiers by hand:
@@ -61,7 +60,6 @@ export const TINY_CONFIG = {
     { id: 'rare', name: 'Rare', color: '#0070dd', targetShare: 0.18 },
     { id: 'legendary', name: 'Legendary', color: '#ff8000', targetShare: 0.01 },
   ],
-  nearMissMargin: 0.1,
 };
 
 // A "random" source that returns the given values in order, so a test can
