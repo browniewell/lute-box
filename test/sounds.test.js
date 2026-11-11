@@ -25,6 +25,7 @@ test('stings stay short and audible', () => {
     for (const note of notes) {
       assert.ok(note.frequency >= 100 && note.frequency <= 5000, `${tierId} frequency`);
       assert.ok(note.startMs >= 0 && note.lengthMs > 0, `${tierId} timing`);
+      assert.ok((note.volume ?? 1) > 0 && (note.volume ?? 1) <= 1, `${tierId} volume`);
     }
   }
 });
