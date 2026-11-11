@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lute Box: art preview</title>
+  <title>Lute Box: art and sound preview</title>
   <link rel="stylesheet" href="src/lute.css">
   <style>
     body { font-family: system-ui, sans-serif; margin: 2rem; line-height: 1.4; }
@@ -11,14 +11,21 @@
     th, td { padding: 0.75rem; border: 1px solid #ddd; text-align: center; vertical-align: bottom; }
     th { font-weight: 600; background: #f6f6f6; }
     .name { font-size: 0.8rem; margin-top: 0.5rem; max-width: 9rem; }
+    #sounds button { font-size: 1rem; padding: 0.5rem 1rem; margin: 0 0.5rem 0.5rem 0; border-left: 6px solid var(--tier-color); }
   </style>
 </head>
 <body>
-  <h1>Art preview</h1>
+  <h1>Art and sound preview</h1>
   <p>
-    Dev only: every base type with each modifier on its own, plus a few
-    stacks. Nothing here is rolled. Not linked from the game.
+    Dev only: nothing here is rolled, and it's not linked from the game.
   </p>
+
+  <h2>Sounds</h2>
+  <p>Plays each tier's sting, whether or not sound is on in the game.</p>
+  <div id="sounds"></div>
+
+  <h2>Art</h2>
+  <p>Every base type with each modifier on its own, plus a few stacks.</p>
   <div id="preview"></div>
   <script type="module" src="src/preview.js"></script>
 </body>

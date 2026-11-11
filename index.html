@@ -14,6 +14,8 @@
     #stage { position: relative; min-height: 12rem; display: flex; align-items: center; margin-top: 1.5rem;
       /* As wide as the lute, so effects placed at 50% center on it. */
       width: fit-content; }
+    /* A clear focus ring on everything, for keyboard players. */
+    :focus-visible { outline: 3px solid #0070dd; outline-offset: 3px; }
     [data-field="odds"], .trophy .odds { text-decoration: underline dotted; cursor: help; }
     #records { margin-top: 3rem; }
     #records dt { font-weight: bold; }
@@ -32,13 +34,17 @@
   <p id="config-error" role="alert" hidden></p>
 
   <button id="open-button" type="button">Open</button>
+  <!-- aria-pressed says on/off to screen readers; the word shows it on screen. -->
+  <button id="sound-button" type="button" aria-pressed="false">Sound: <span data-sound-state aria-hidden="true">off</span></button>
   <p><small>or press Space</small></p>
 
   <!-- The box, then the lute. Decoration: the name below says which lute it is. -->
   <div id="stage" aria-hidden="true"></div>
 
-  <!-- aria-live reads each new lute aloud to screen readers. -->
-  <div id="reveal" aria-live="polite" hidden>
+  <!-- aria-live reads each new lute aloud to screen readers. It's in the
+       page from the start (not hidden), because some screen readers skip
+       a live region's first update if it only just appeared. -->
+  <div id="reveal" class="pending" aria-live="polite">
     <p><strong data-field="name"></strong></p>
     <p>Tier: <span data-field="tier"></span></p>
     <p>Odds: <span data-field="odds"></span></p>

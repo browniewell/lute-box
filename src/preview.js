@@ -1,8 +1,23 @@
-// Builds the dev-only art preview (preview.html): a table with one row per
-// base type and one column per modifier, plus some stacks.
+// Builds the dev-only preview (preview.html): a button per tier to hear its
+// sting, and a table with one row per base type and one column per
+// modifier, plus some stacks.
 import { CONFIG } from './config.js';
 import { lootName } from './names.js';
 import { renderLute } from './render-lute.js';
+import { TIER_STINGS } from './sounds.js';
+import { unlockAudio, playSting } from './play-sound.js';
+
+for (const tier of CONFIG.tiers) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.textContent = tier.name;
+  button.style.setProperty('--tier-color', tier.color);
+  button.addEventListener('click', () => {
+    unlockAudio(); // Must happen in the click, before playing.
+    playSting(TIER_STINGS[tier.id]);
+  });
+  document.getElementById('sounds').append(button);
+}
 
 const plainGroups = Object.fromEntries(
   CONFIG.groups.map((group) => [group.id, group.options.find((o) => o.isDefault).id]),
