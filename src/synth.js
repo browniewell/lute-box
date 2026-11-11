@@ -67,13 +67,15 @@ export function reverbImpulse(sampleRate, lengthMs, random) {
   return [channel(), channel()];
 }
 
-// White noise smoothed once (a softer, warmer pick than raw noise), with
-// any DC offset removed so the string doesn't start off-center.
+// White noise smoothed a few times, like plucking with the soft of a
+// finger rather than a pick: raw noise sounds bright and scratchy. Any DC
+// offset is removed so the string doesn't start off-center.
+const PICK_SOFTNESS = 4; // Smoothing passes. More = darker, gentler pluck.
+
 function noiseBurst(length, random) {
-  const raw = Array.from({ length }, () => random() * 2 - 1);
-  const burst = new Float32Array(length);
-  for (let i = 0; i < length; i++) {
-    burst[i] = 0.5 * (raw[i] + raw[(i + 1) % length]);
+  let burst = Float32Array.from({ length }, () => random() * 2 - 1);
+  for (let pass = 0; pass < PICK_SOFTNESS; pass++) {
+    burst = burst.map((s, i) => 0.5 * (s + burst[(i + 1) % length]));
   }
   const mean = burst.reduce((sum, s) => sum + s, 0) / length;
   return burst.map((s) => s - mean);

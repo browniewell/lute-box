@@ -16,7 +16,23 @@ test('stings never get smaller as tiers get rarer', () => {
     const label = `${CONFIG.tiers[i - 1].id} -> ${CONFIG.tiers[i].id}`;
     assert.ok(stings[i].length >= stings[i - 1].length, `notes, ${label}`);
     assert.ok(stingLength(stings[i]) >= stingLength(stings[i - 1]), `length, ${label}`);
+    assert.ok(loudest(stings[i]) >= loudest(stings[i - 1]), `volume, ${label}`);
   }
+});
+
+// Players hear the common sting on most pulls, so it has to stay out of
+// the way: one short, quiet, soft note.
+test('the common sting is a single short, quiet, soft note', () => {
+  const common = TIER_STINGS[CONFIG.tiers[0].id];
+  assert.equal(common.length, 1);
+  assert.ok(stingLength(common) <= 300, 'short');
+  assert.ok(loudest(common) <= 0.5, 'quiet');
+  assert.equal(common[0].tone, 'soft');
+});
+
+test('only the two rarest tiers use the plucked-string tone', () => {
+  const plain = CONFIG.tiers.slice(0, -2).flatMap((tier) => TIER_STINGS[tier.id]);
+  assert.ok(plain.every((note) => note.tone === 'soft'));
 });
 
 test('stings stay short and audible', () => {
@@ -25,10 +41,15 @@ test('stings stay short and audible', () => {
     for (const note of notes) {
       assert.ok(note.frequency >= 100 && note.frequency <= 5000, `${tierId} frequency`);
       assert.ok(note.startMs >= 0 && note.lengthMs > 0, `${tierId} timing`);
-      assert.ok((note.volume ?? 1) > 0 && (note.volume ?? 1) <= 1, `${tierId} volume`);
+      assert.ok(note.volume > 0 && note.volume <= 1, `${tierId} volume`);
+      assert.ok(['soft', 'string'].includes(note.tone), `${tierId} tone`);
     }
   }
 });
+
+function loudest(notes) {
+  return Math.max(...notes.map((note) => note.volume));
+}
 
 test('stingLength is when the last note ends', () => {
   assert.equal(

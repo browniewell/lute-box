@@ -2,11 +2,11 @@
 // If the browser has no Web Audio, or blocks it, the game stays silent.
 //
 // Signal path for every note:
-//   two plucked strings (synth.js) -> pan -> mix -> dry + reverb -> compressor -> speakers
+//   soft tone or plucked strings -> pan -> mix -> dry + reverb -> compressor -> speakers
 import { pluckSamples, reverbImpulse } from './synth.js';
 
-const VOLUME = 0.65; // The compressor evens out loud chords, so this can sit higher.
-const REVERB_MIX = 0.3; // How much room to add. 0 is dry.
+const VOLUME = 0.6; // Overall level. Each note's own volume scales from here.
+const REVERB_MIX = 0.18; // How much room to add. 0 is dry.
 // Lutes have paired strings for each note, tuned a hair apart. The slow
 // beating between the two is a big part of the lute's warm sound.
 const PAIR_DETUNE = 1.0025; // About 4 cents sharp.
@@ -48,15 +48,43 @@ export function playSting(notes) {
   }
 }
 
-function playNote({ frequency, lengthMs, volume = 1 }, at) {
+function playNote(note, at) {
   // Melody notes spread a little, lower ones left and higher ones right,
   // centered between C5 and C6. Bass notes stay in the middle.
+  const { frequency } = note;
   const pan = context.createStereoPanner();
   pan.pan.value = frequency < 500 ? 0 : Math.max(-0.5, Math.min(0.5, Math.log2(frequency / 740) * 0.25));
+  pan.connect(mix);
+
+  if (note.tone === 'string') {
+    playStrings(note, at, pan);
+  } else {
+    playSoft(note, at, pan);
+  }
+}
+
+// A rounded mallet tone: a pure sine with a faint octave on top that
+// fades fast, giving a gentle "tok" at the start and nothing sharp.
+function playSoft({ frequency, lengthMs, volume }, at, output) {
+  const end = at + lengthMs / 1000;
+  for (const [multiple, level, decay] of [[1, 1, end], [2, 0.15, at + 0.06]]) {
+    const oscillator = context.createOscillator();
+    oscillator.frequency.value = frequency * multiple;
+    const envelope = context.createGain();
+    // A 6 ms rise instead of an instant start, so there's no click.
+    envelope.gain.setValueAtTime(0, at);
+    envelope.gain.linearRampToValueAtTime(volume * level, at + 0.006);
+    envelope.gain.exponentialRampToValueAtTime(0.0001, decay);
+    oscillator.connect(envelope).connect(output);
+    oscillator.start(at);
+    oscillator.stop(end + 0.05);
+  }
+}
+
+function playStrings({ frequency, lengthMs, volume }, at, output) {
   const gain = context.createGain();
   gain.gain.value = volume * 0.5; // Two strings per note.
-  gain.connect(pan).connect(mix);
-
+  gain.connect(output);
   for (const [string, rate] of [[0, 1], [1, PAIR_DETUNE]]) {
     const source = context.createBufferSource();
     source.buffer = pluckBuffer(frequency, lengthMs, string);
@@ -85,7 +113,7 @@ function buildMix(ctx) {
   const input = ctx.createGain();
 
   const reverb = ctx.createConvolver();
-  const [left, right] = reverbImpulse(ctx.sampleRate, 1800, Math.random);
+  const [left, right] = reverbImpulse(ctx.sampleRate, 1200, Math.random);
   const impulse = ctx.createBuffer(2, left.length, ctx.sampleRate);
   impulse.copyToChannel(left, 0);
   impulse.copyToChannel(right, 1);
