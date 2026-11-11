@@ -187,6 +187,8 @@ for (const tab of tabs) {
 }
 
 openButton.addEventListener('click', openNext);
+// Clicking or tapping the box (or the lute after it) opens the next one.
+stage.addEventListener('click', openNext);
 
 soundButton.addEventListener('click', () => {
   soundOn = !soundOn;

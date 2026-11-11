@@ -217,19 +217,28 @@ button[aria-disabled="true"] { cursor: progress; }
    both ways, so effects placed at 50% land on the lute. */
 #stage {
   position: relative;
+  /* Its own layer, so the beam (z-index -1) draws over this background
+     but still behind the lute. */
+  z-index: 0;
   flex: 1;
   min-height: 0;
   padding: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
+  /* A dark alcove with a soft spotlight, so brown lutes stand out from it. */
+  background: radial-gradient(ellipse at 50% 55%, #1e1712, #070504 70%);
+  box-shadow: inset 0 0 0 4px var(--outline);
+  /* Clicking or tapping here opens a box too (main.js). */
+  cursor: pointer;
+  touch-action: manipulation; /* No double-tap zoom when tapping fast. */
 }
 
 /* The wooden counter the box sits on. */
 .counter {
   flex: none;
   height: 16px;
-  margin: 0 -12px;
+  margin: -12px -12px 0;
   background: linear-gradient(var(--rim) 0 4px, var(--shelf) 4px 12px, var(--outline) 12px);
 }
 

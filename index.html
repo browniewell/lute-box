@@ -21,14 +21,8 @@
   <div id="play" class="panel">
     <p id="config-error" role="alert" hidden></p>
 
-    <div class="controls">
-      <button id="open-button" type="button">Open</button>
-      <!-- aria-pressed says on/off to screen readers; the word shows it on screen. -->
-      <button id="sound-button" type="button" aria-pressed="false">Sound: <span data-sound-state aria-hidden="true">off</span></button>
-      <small class="hint">or press Space</small>
-    </div>
-
-    <!-- The box, then the lute. Decoration: the name below says which lute it is. -->
+    <!-- The box, then the lute. Decoration: the name below says which lute it
+         is. Clicking it opens a box, as a shortcut for the Open button. -->
     <div id="stage" aria-hidden="true"></div>
     <div class="counter" aria-hidden="true"></div>
 
@@ -39,6 +33,14 @@
       <p><strong data-field="name"></strong></p>
       <p>Tier: <span data-field="tier"></span></p>
       <p>Odds: <span data-field="odds"></span></p>
+    </div>
+
+    <!-- At the bottom, in reach of a thumb on a phone. -->
+    <div class="controls">
+      <button id="open-button" type="button">Open</button>
+      <!-- aria-pressed says on/off to screen readers; the word shows it on screen. -->
+      <button id="sound-button" type="button" aria-pressed="false">Sound: <span data-sound-state aria-hidden="true">off</span></button>
+      <small class="hint">or press Space, or click the box</small>
     </div>
   </div>
 
