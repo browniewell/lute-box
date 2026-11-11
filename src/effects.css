@@ -31,6 +31,8 @@
   width: 8px;
   height: 8px;
   margin: -4px 0 0 -4px;
+  /* A dark pixel outline, so light colors show on the light stage. */
+  box-shadow: 0 0 0 2px #120a05;
   pointer-events: none;
   animation: particle-fly 900ms ease-out forwards;
 }
