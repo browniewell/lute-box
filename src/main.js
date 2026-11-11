@@ -17,7 +17,7 @@ import { emptyRecords, addPull } from './records.js';
 import { loadRecords, saveRecords, clearRecords, loadSoundOn, saveSoundOn } from './storage.js';
 import { renderRecords } from './render-records.js';
 import { TIER_STINGS } from './sounds.js';
-import { unlockAudio, releaseAudio, playSting } from './play-sound.js';
+import { unlockAudio, playSting } from './play-sound.js';
 
 const page = document.getElementById('game');
 const openButton = document.getElementById('open-button');
@@ -193,7 +193,6 @@ stage.addEventListener('click', openNext);
 soundButton.addEventListener('click', () => {
   soundOn = !soundOn;
   if (soundOn) unlockAudio();
-  else releaseAudio();
   if (storage) saveSoundOn(storage, soundOn);
   showSoundState();
 });
