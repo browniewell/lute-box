@@ -70,7 +70,7 @@ let records = saved.records;
 if (saved.problem) showStorageNote(saved.problem);
 renderRecords(recordsSection, records, tiers);
 // A closed box waits on the counter until the first open.
-renderBox(stage, BASE_PIXEL_SIZE).classList.add('idle');
+renderBox(stage, BASE_PIXEL_SIZE);
 
 // Off by default (handoff); the player's choice is remembered.
 let soundOn = loadSoundOn(storage);

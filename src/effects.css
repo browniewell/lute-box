@@ -2,27 +2,6 @@
    match the constants there. None of this runs with reduced motion on:
    effects.js gives an empty plan instead. */
 
-/* The box: shakes harder and glows brighter until it opens. */
-.box {
-  animation-name: box-shake;
-  animation-timing-function: linear;
-  animation-fill-mode: forwards;
-}
-
-@keyframes box-shake {
-  0% { transform: translate(0, 0); filter: drop-shadow(0 0 0 var(--tier-color)); }
-  10% { transform: translate(calc(var(--shake) * -0.3), 0); }
-  20% { transform: translate(calc(var(--shake) * 0.3), calc(var(--shake) * -0.2)); }
-  30% { transform: translate(calc(var(--shake) * -0.5), calc(var(--shake) * 0.2)); }
-  40% { transform: translate(calc(var(--shake) * 0.5), 0); }
-  50% { transform: translate(calc(var(--shake) * -0.7), calc(var(--shake) * -0.3)); }
-  60% { transform: translate(calc(var(--shake) * 0.7), calc(var(--shake) * 0.3)); }
-  70% { transform: translate(calc(var(--shake) * -0.85), 0); }
-  80% { transform: translate(calc(var(--shake) * 0.85), calc(var(--shake) * -0.4)); }
-  90% { transform: translate(calc(var(--shake) * -1), calc(var(--shake) * 0.4)); }
-  100% { transform: translate(var(--shake), 0); filter: drop-shadow(0 0 16px var(--tier-color)) drop-shadow(0 0 4px var(--tier-color)); }
-}
-
 /* Particles: square pixels flying out from the lute's center. */
 .particle {
   position: absolute;
@@ -111,6 +90,3 @@
 /* Reveal text fades in once the box opens. It stays in the page while
    hidden so screen readers still announce the new lute. */
 #reveal.pending { opacity: 0; }
-
-/* The closed box waiting on the counter before the first open. */
-.box.idle { animation: none; }

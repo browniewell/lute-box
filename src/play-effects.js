@@ -1,7 +1,9 @@
 // Plays an EffectPlan (effects.js) on the page. Browser only. Styles and
-// keyframes are in effects.css.
+// keyframes are in effects.css, except the box's, which come from
+// boxShakeFrames in effects.js.
 import { renderBox } from './render-lute.js';
 import { BASE_PIXEL_SIZE } from './look.js';
+import { boxShakeFrames } from './effects.js';
 
 // How long each reveal effect runs. Must match the animations in effects.css.
 const FLASH_MS = 500;
@@ -22,9 +24,10 @@ export function playAnticipation(stage, plan, tierColor) {
   if (plan.anticipationMs === 0) return Promise.resolve();
 
   const box = renderBox(stage, BASE_PIXEL_SIZE);
-  box.style.setProperty('--tier-color', tierColor);
-  box.style.setProperty('--shake', `${plan.shake}px`);
-  box.style.animationDuration = `${plan.anticipationMs}ms`;
+  box.animate(boxShakeFrames(plan.anticipationMs, plan.shake, tierColor), {
+    duration: plan.anticipationMs,
+    fill: 'forwards',
+  });
   return wait(plan.anticipationMs);
 }
 
