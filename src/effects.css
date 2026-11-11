@@ -31,6 +31,8 @@
   width: 8px;
   height: 8px;
   margin: -4px 0 0 -4px;
+  /* A dark pixel outline, so light colors show on the light stage. */
+  box-shadow: 0 0 0 2px #120a05;
   pointer-events: none;
   animation: particle-fly 900ms ease-out forwards;
 }
@@ -109,3 +111,6 @@
 /* Reveal text fades in once the box opens. It stays in the page while
    hidden so screen readers still announce the new lute. */
 #reveal.pending { opacity: 0; }
+
+/* The closed box waiting on the counter before the first open. */
+.box.idle { animation: none; }

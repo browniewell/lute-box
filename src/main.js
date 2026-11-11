@@ -1,12 +1,16 @@
 // Browser entry point. Keep game logic out of this file: anything here
 // touches the page, so it can't be unit tested in Node. The logic lives
-// in open-box.js, keyboard.js, look.js, effects.js, sounds.js and records.js.
+// in open-box.js, keyboard.js, tabs.js, look.js, effects.js, sounds.js and
+// records.js.
 import { CONFIG } from './config.js';
 import { validateConfig } from './validate-config.js';
 import { computeTiers } from './tiers.js';
 import { openBox } from './open-box.js';
 import { isSpaceToOpen } from './keyboard.js';
-import { renderLute } from './render-lute.js';
+import { renderLute, renderBox } from './render-lute.js';
+import { renderScenery, renderWall } from './render-scenery.js';
+import { BASE_PIXEL_SIZE } from './look.js';
+import { nextTabIndex } from './tabs.js';
 import { effectPlan } from './effects.js';
 import { playAnticipation, playReveal } from './play-effects.js';
 import { emptyRecords, addPull } from './records.js';
@@ -24,7 +28,21 @@ const recordsSection = document.getElementById('records');
 const storageNote = document.getElementById('storage-note');
 const resetButton = document.getElementById('reset-button');
 const soundButton = document.getElementById('sound-button');
+const tabs = [...document.querySelectorAll('[role="tab"]')];
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+// Must match the phone breakpoint in tavern.css.
+const phone = window.matchMedia('(max-width: 760px)');
+
+// The tavern goes up first, so even a config error shows on the real page.
+renderWall();
+function drawScenery() {
+  renderScenery(
+    { sign: document.getElementById('sign'), lanterns: [...document.querySelectorAll('.lantern')] },
+    phone.matches ? 3 : 4,
+  );
+}
+drawScenery();
+phone.addEventListener('change', drawScenery);
 
 let tiers;
 try {
@@ -51,6 +69,8 @@ const storage = saved.storage;
 let records = saved.records;
 if (saved.problem) showStorageNote(saved.problem);
 renderRecords(recordsSection, records, tiers);
+// A closed box waits on the counter until the first open.
+renderBox(stage, BASE_PIXEL_SIZE).classList.add('idle');
 
 // Off by default (handoff); the player's choice is remembered.
 let soundOn = loadSoundOn(storage);
@@ -63,6 +83,8 @@ let opening = false;
 async function openNext() {
   if (opening) return;
   opening = true;
+  // Space can open a box from the phone's Trophies tab; show it happening.
+  showTab('play');
   // Before any await: browsers only allow starting audio during the click.
   if (soundOn) unlockAudio();
   // aria-disabled rather than disabled: a disabled button drops keyboard
@@ -81,7 +103,8 @@ async function openNext() {
     clearReveal();
     await playAnticipation(stage, plan, lute.tierColor);
 
-    renderLute(stage, lute.roll);
+    // Shrinks a tall lute (a jumbo theorbo) to fit a short window.
+    renderLute(stage, lute.roll, { maxHeight: stage.clientHeight - STAGE_PADDING * 2 });
     showReveal(lute);
     if (soundOn) playSting(TIER_STINGS[lute.tierId]);
     renderRecords(recordsSection, records, tiers);
@@ -91,6 +114,9 @@ async function openNext() {
     openButton.removeAttribute('aria-disabled');
   }
 }
+
+// #stage's padding in tavern.css.
+const STAGE_PADDING = 12;
 
 function clearReveal() {
   reveal.classList.add('pending');
@@ -123,7 +149,46 @@ function showStorageNote(problem) {
   storageNote.hidden = false;
 }
 
+// Phone tabs. On wider screens the tab bar is hidden and every panel shows,
+// so the panels only take the tabpanel role while the tabs are in use.
+function showTab(id) {
+  page.dataset.tab = id;
+  for (const tab of tabs) {
+    const selected = tab.dataset.tab === id;
+    tab.setAttribute('aria-selected', String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+  }
+}
+
+function setPanelRoles() {
+  for (const tab of tabs) {
+    const panel = document.getElementById(tab.getAttribute('aria-controls'));
+    if (phone.matches) {
+      panel.setAttribute('role', 'tabpanel');
+      panel.setAttribute('aria-labelledby', tab.id);
+    } else {
+      panel.removeAttribute('role');
+      panel.removeAttribute('aria-labelledby');
+    }
+  }
+}
+setPanelRoles();
+phone.addEventListener('change', setPanelRoles);
+
+for (const tab of tabs) {
+  tab.addEventListener('click', () => showTab(tab.dataset.tab));
+  tab.addEventListener('keydown', (event) => {
+    const next = nextTabIndex(event.key, tabs.indexOf(tab), tabs.length);
+    if (next === null) return;
+    event.preventDefault();
+    tabs[next].focus();
+    showTab(tabs[next].dataset.tab);
+  });
+}
+
 openButton.addEventListener('click', openNext);
+// Clicking or tapping the box (or the lute after it) opens the next one.
+stage.addEventListener('click', openNext);
 
 soundButton.addEventListener('click', () => {
   soundOn = !soundOn;

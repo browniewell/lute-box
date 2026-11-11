@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { luteLook, sparklePoints, MODIFIER_LOOKS, BASE_PIXEL_SIZE } from '../src/look.js';
+import { luteLook, sparklePoints, displayPixelSize, MODIFIER_LOOKS, BASE_PIXEL_SIZE } from '../src/look.js';
 import { CONFIG } from '../src/config.js';
 
 function roll(groups, modifiers = []) {
@@ -61,4 +61,31 @@ test('sparkles sit on drawn pixels, never on clear ones', () => {
   for (const { x, y } of points) {
     assert.notEqual(sprite[y][x], '.');
   }
+});
+
+// displayPixelSize: how big each sprite pixel is drawn in a given spot.
+test('display size keeps the look size when it fits', () => {
+  assert.equal(displayPixelSize(6, 28, {}), 6);
+  assert.equal(displayPixelSize(9, 28, { maxHeight: 400 }), 9);
+});
+
+test('display size shrinks to whole pixels that fit the height', () => {
+  // A jumbo theorbo (52 rows at 9px = 468px) in a 350px stage.
+  assert.equal(displayPixelSize(9, 52, { maxHeight: 350 }), 6);
+});
+
+test('display size never drops below one pixel', () => {
+  assert.equal(displayPixelSize(6, 52, { maxHeight: 10 }), 1);
+});
+
+test('scale keeps jumbo bigger than normal bigger than tiny', () => {
+  const trophy = { scale: 1 / 3 };
+  assert.equal(displayPixelSize(3, 28, trophy), 1); // tiny
+  assert.equal(displayPixelSize(6, 28, trophy), 2); // normal
+  assert.equal(displayPixelSize(9, 28, trophy), 3); // jumbo
+});
+
+test('scale and max height combine', () => {
+  // A normal theorbo on the trophy shelf: 2px would be 104px, so 1px.
+  assert.equal(displayPixelSize(6, 52, { scale: 1 / 3, maxHeight: 56 }), 1);
 });

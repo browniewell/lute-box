@@ -79,3 +79,21 @@ export function sparklePoints(sprite, count) {
   const step = drawn.length / count;
   return Array.from({ length: count }, (_, i) => drawn[Math.floor(step * (i + 0.5))]);
 }
+
+/**
+ * How many screen pixels to draw each sprite pixel at in a given spot.
+ * Always a whole number (at least 1), so every pixel stays crisp.
+ *
+ * @param {number} pixelSize From luteLook: already includes jumbo or tiny.
+ * @param {number} spriteHeight Rows in the sprite.
+ * @param {{ scale?: number, maxHeight?: number }} options
+ *   scale: shrink everything by this much (the trophy shelf uses 1/3), so
+ *   jumbo stays bigger than normal. maxHeight: the most screen pixels tall
+ *   the lute may be; it shrinks further to fit.
+ * @returns {number}
+ */
+export function displayPixelSize(pixelSize, spriteHeight, { scale = 1, maxHeight = Infinity }) {
+  const scaled = Math.max(1, Math.round(pixelSize * scale));
+  const fits = Math.floor(maxHeight / spriteHeight);
+  return Math.max(1, Math.min(scaled, fits));
+}
