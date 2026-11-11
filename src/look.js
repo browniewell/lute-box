@@ -97,3 +97,34 @@ export function displayPixelSize(pixelSize, spriteHeight, { scale = 1, maxHeight
   const fits = Math.floor(maxHeight / spriteHeight);
   return Math.max(1, Math.min(scaled, fits));
 }
+
+const PEG = 'p';
+const SIDES = [
+  { side: 'top', dx: 0, dy: -1 },
+  { side: 'right', dx: 1, dy: 0 },
+  { side: 'bottom', dx: 0, dy: 1 },
+  { side: 'left', dx: -1, dy: 0 },
+];
+
+/**
+ * The pale tuning pegs are the only part of a lute with no dark outline,
+ * so on the light stage they seem to float. This finds each peg side that
+ * faces clear space (or the sprite's edge), for render-lute.js to draw a
+ * thin dark line along.
+ *
+ * @param {string[]} sprite Rows of pixels, as in sprites.js.
+ * @returns {{ x: number, y: number, side: 'top' | 'right' | 'bottom' | 'left' }[]}
+ */
+export function pegEdges(sprite) {
+  const edges = [];
+  sprite.forEach((row, y) => {
+    [...row].forEach((char, x) => {
+      if (char !== PEG) return;
+      for (const { side, dx, dy } of SIDES) {
+        const neighbor = sprite[y + dy]?.[x + dx] ?? '.';
+        if (neighbor === '.') edges.push({ x, y, side });
+      }
+    });
+  });
+  return edges;
+}
