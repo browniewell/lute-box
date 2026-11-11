@@ -4,6 +4,7 @@
 import { emptyRecords } from './records.js';
 
 export const STORAGE_KEY = 'lute-box:records';
+const SOUND_KEY = 'lute-box:sound';
 
 /**
  * @typedef {Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>} StorageLike
@@ -59,6 +60,29 @@ export function saveRecords(storage, records) {
 export function clearRecords(storage) {
   try {
     storage.removeItem(STORAGE_KEY);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Whether the player turned sound on. Off by default, and off whenever
+ * storage fails or holds anything but "on".
+ * @param {StorageLike | null} storage
+ */
+export function loadSoundOn(storage) {
+  try {
+    return storage.getItem(SOUND_KEY) === 'on';
+  } catch {
+    return false;
+  }
+}
+
+/** @returns {boolean} Whether it saved. */
+export function saveSoundOn(storage, on) {
+  try {
+    storage.setItem(SOUND_KEY, on ? 'on' : 'off');
     return true;
   } catch {
     return false;

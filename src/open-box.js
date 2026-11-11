@@ -3,6 +3,7 @@ import { rollLute } from './roll.js';
 import { exactOdds } from './odds.js';
 import { lootName } from './names.js';
 import { tierFor } from './tiers.js';
+import { nearMiss } from './near-miss.js';
 import { formatOdds, formatPercent } from './format.js';
 
 /**
@@ -16,6 +17,8 @@ import { formatOdds, formatPercent } from './format.js';
  * @property {string} oddsText e.g. "1 in 25,000"
  * @property {string} percentText e.g. "0.004%", shown on hover.
  * @property {import('./roll.js').Roll} roll For drawing the sprite.
+ * @property {{ tierName: string, tierColor: string } | null} nearMiss
+ *   The tier this lute only just missed, for the "so close" callout.
  */
 
 /**
@@ -31,6 +34,7 @@ export function openBox(random, tiers, config = CONFIG) {
   const roll = rollLute(random, config);
   const odds = exactOdds(roll, config);
   const tier = tierFor(odds, tiers);
+  const missed = nearMiss(odds, tiers, config.nearMissMargin);
   return {
     name: lootName(roll, config),
     tierId: tier.id,
@@ -40,5 +44,6 @@ export function openBox(random, tiers, config = CONFIG) {
     oddsText: formatOdds(odds),
     percentText: formatPercent(odds),
     roll,
+    nearMiss: missed && { tierName: missed.name, tierColor: missed.color },
   };
 }

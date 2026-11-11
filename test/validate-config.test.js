@@ -47,3 +47,14 @@ test('tier target shares must sum to 1', () => {
   config.tiers[0].targetShare = 0.5;
   assert.throws(() => validateConfig(config), /tier.*sum to 1/i);
 });
+
+test('the near miss margin must be from 0 up to (not including) 1', () => {
+  for (const margin of [-0.1, 1, undefined, '0.1']) {
+    const config = copyOfTestConfig();
+    config.nearMissMargin = margin;
+    assert.throws(() => validateConfig(config), /near miss/i, String(margin));
+  }
+  const config = copyOfTestConfig();
+  config.nearMissMargin = 0;
+  assert.doesNotThrow(() => validateConfig(config));
+});

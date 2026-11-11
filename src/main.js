@@ -1,6 +1,6 @@
 // Browser entry point. Keep game logic out of this file: anything here
 // touches the page, so it can't be unit tested in Node. The logic lives
-// in open-box.js, keyboard.js, look.js, effects.js and records.js.
+// in open-box.js, keyboard.js, look.js, effects.js, sounds.js and records.js.
 import { CONFIG } from './config.js';
 import { validateConfig } from './validate-config.js';
 import { computeTiers } from './tiers.js';
@@ -10,8 +10,10 @@ import { renderLute } from './render-lute.js';
 import { effectPlan } from './effects.js';
 import { playAnticipation, playReveal } from './play-effects.js';
 import { emptyRecords, addPull } from './records.js';
-import { loadRecords, saveRecords, clearRecords } from './storage.js';
+import { loadRecords, saveRecords, clearRecords, loadSoundOn, saveSoundOn } from './storage.js';
 import { renderRecords } from './render-records.js';
+import { TIER_STINGS } from './sounds.js';
+import { unlockAudio, playSting } from './play-sound.js';
 
 const page = document.getElementById('game');
 const openButton = document.getElementById('open-button');
@@ -21,6 +23,7 @@ const errorMessage = document.getElementById('config-error');
 const recordsSection = document.getElementById('records');
 const storageNote = document.getElementById('storage-note');
 const resetButton = document.getElementById('reset-button');
+const soundButton = document.getElementById('sound-button');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 let tiers;
@@ -49,6 +52,10 @@ let records = saved.records;
 if (saved.problem) showStorageNote(saved.problem);
 renderRecords(recordsSection, records, tiers);
 
+// Off by default (handoff); the player's choice is remembered.
+let soundOn = loadSoundOn(storage);
+showSoundState();
+
 // True from the click until the last reveal effect ends. Opens are ignored
 // meanwhile, rather than skipping ahead (Ryan's call in #7).
 let opening = false;
@@ -56,6 +63,8 @@ let opening = false;
 async function openNext() {
   if (opening) return;
   opening = true;
+  // Before any await: browsers only allow starting audio during the click.
+  if (soundOn) unlockAudio();
   // aria-disabled rather than disabled: a disabled button drops keyboard
   // focus, which would break pressing Space on it again.
   openButton.setAttribute('aria-disabled', 'true');
@@ -74,6 +83,7 @@ async function openNext() {
 
     renderLute(stage, lute.roll);
     showReveal(lute);
+    if (soundOn) playSting(TIER_STINGS[lute.tierId]);
     renderRecords(recordsSection, records, tiers);
     await playReveal(stage, page, plan, lute.tierColor);
   } finally {
@@ -100,8 +110,19 @@ function showReveal(lute) {
   odds.textContent = lute.oddsText;
   odds.title = lute.percentText;
 
+  // Words, not just color, so it reads the same without color vision.
+  const nearMiss = reveal.querySelector('[data-field="near-miss"]');
+  if (lute.nearMiss) {
+    nearMiss.textContent = `So close! Almost ${lute.nearMiss.tierName}.`;
+    nearMiss.style.color = lute.nearMiss.tierColor;
+  }
+
   reveal.classList.remove('pending');
-  reveal.hidden = false;
+}
+
+function showSoundState() {
+  soundButton.setAttribute('aria-pressed', String(soundOn));
+  soundButton.querySelector('[data-sound-state]').textContent = soundOn ? 'on' : 'off';
 }
 
 function showStorageNote(problem) {
@@ -110,6 +131,13 @@ function showStorageNote(problem) {
 }
 
 openButton.addEventListener('click', openNext);
+
+soundButton.addEventListener('click', () => {
+  soundOn = !soundOn;
+  if (soundOn) unlockAudio();
+  if (storage) saveSoundOn(storage, soundOn);
+  showSoundState();
+});
 
 resetButton.addEventListener('click', () => {
   // Ignored mid-open, so a pull being revealed can't be wiped half-saved.
@@ -121,7 +149,7 @@ resetButton.addEventListener('click', () => {
 });
 
 document.addEventListener('keydown', (event) => {
-  if (!isSpaceToOpen(event)) {
+  if (!isSpaceToOpen(openButton, event)) {
     return;
   }
   // Stops the page scrolling, and stops a focused Open button from also

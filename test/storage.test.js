@@ -1,6 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { loadRecords, saveRecords, clearRecords, STORAGE_KEY } from '../src/storage.js';
+import {
+  loadRecords, saveRecords, clearRecords, STORAGE_KEY, loadSoundOn, saveSoundOn,
+} from '../src/storage.js';
 import { emptyRecords, addPull } from '../src/records.js';
 import { TEST_CONFIG } from './fixtures.js';
 
@@ -86,4 +88,23 @@ test('clearing removes the saved records, and never throws', () => {
   assert.equal(storage.data.has(STORAGE_KEY), false);
   assert.equal(clearRecords({ removeItem: throwing }), false);
   assert.equal(clearRecords(null), false);
+});
+
+test('sound is off by default, and remembers being turned on and off', () => {
+  const storage = fakeStorage();
+  assert.equal(loadSoundOn(storage), false);
+  assert.equal(saveSoundOn(storage, true), true);
+  assert.equal(loadSoundOn(storage), true);
+  saveSoundOn(storage, false);
+  assert.equal(loadSoundOn(storage), false);
+});
+
+test('sound stays off when storage fails or holds something unexpected', () => {
+  assert.equal(loadSoundOn(null), false);
+  assert.equal(loadSoundOn({ getItem: throwing }), false);
+  const storage = fakeStorage();
+  storage.setItem('lute-box:sound', 'yes please');
+  assert.equal(loadSoundOn(storage), false);
+  assert.equal(saveSoundOn({ setItem: throwing }, true), false);
+  assert.equal(saveSoundOn(null, true), false);
 });
