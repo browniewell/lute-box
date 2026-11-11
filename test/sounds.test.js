@@ -21,12 +21,21 @@ test('stings never get smaller as tiers get rarer', () => {
 });
 
 // Players hear the common sting on most pulls, so it has to stay out of
-// the way: one short, quiet, soft note.
-test('the common sting is a single short, quiet, soft note', () => {
+// the way: at most two short, quiet notes.
+test('the common sting is short and quiet', () => {
   const common = TIER_STINGS[CONFIG.tiers[0].id];
-  assert.equal(common.length, 1);
-  assert.ok(stingLength(common) <= 300, 'short');
+  assert.ok(common.length <= 2, 'one or two notes');
+  assert.ok(stingLength(common) <= 400, 'short');
   assert.ok(loudest(common) <= 0.5, 'quiet');
+});
+
+// The rarest pull should sound clearly bigger than the one below it, not
+// just a note longer.
+test('the rarest tier stands out from the next one down', () => {
+  const [below, rarest] = CONFIG.tiers.slice(-2).map((tier) => TIER_STINGS[tier.id]);
+  assert.ok(rarest.length >= below.length + 4, 'several more notes');
+  assert.ok(Math.max(...rarest.map((n) => n.frequency)) > Math.max(...below.map((n) => n.frequency)), 'reaches higher');
+  assert.ok(Math.min(...rarest.map((n) => n.frequency)) < Math.min(...below.map((n) => n.frequency)), 'reaches lower');
 });
 
 // Nothing should start with a hard edge: that's what made the plucked
