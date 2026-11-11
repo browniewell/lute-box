@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { luteLook, sparklePoints, displayPixelSize, edgeWidth, MODIFIER_LOOKS, BASE_PIXEL_SIZE } from '../src/look.js';
+import { luteLook, sparklePoints, displayPixelSize, pegEdges, MODIFIER_LOOKS, BASE_PIXEL_SIZE } from '../src/look.js';
 import { CONFIG } from '../src/config.js';
 
 function roll(groups, modifiers = []) {
@@ -90,10 +90,25 @@ test('scale and max height combine', () => {
   assert.equal(displayPixelSize(6, 52, { scale: 1 / 3, maxHeight: 56 }), 1);
 });
 
-// edgeWidth: the black outline around a drawn lute, in screen pixels.
-test('the outline is a third of a sprite pixel, at least 1px', () => {
-  assert.equal(edgeWidth(6), 2); // normal
-  assert.equal(edgeWidth(9), 3); // jumbo
-  assert.equal(edgeWidth(3), 1); // tiny
-  assert.equal(edgeWidth(1), 1); // small trophy
+// pegEdges: where the thin dark edge goes around the pale tuning pegs.
+test('a lone peg gets an edge on all four sides', () => {
+  const sprite = ['...', '.p.', '...'];
+  assert.deepEqual(pegEdges(sprite), [
+    { x: 1, y: 1, side: 'top' },
+    { x: 1, y: 1, side: 'right' },
+    { x: 1, y: 1, side: 'bottom' },
+    { x: 1, y: 1, side: 'left' },
+  ]);
+});
+
+test('no edge where a peg touches another drawn pixel', () => {
+  const sprite = ['po'];
+  assert.deepEqual(
+    pegEdges(sprite).map((edge) => edge.side),
+    ['top', 'bottom', 'left'],
+  );
+});
+
+test('only pegs get edges', () => {
+  assert.deepEqual(pegEdges(['...', '.b.', '...']), []);
 });
