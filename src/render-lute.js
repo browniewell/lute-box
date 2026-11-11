@@ -75,9 +75,10 @@ export function renderBox(container, pixelSize) {
   return wrapper;
 }
 
-// A 1px dark line along each peg side that faces clear space, drawn in the
-// clear pixel next to it so the peg keeps its full size. On the canvas, so
-// it changes with modifiers like the rest of the lute.
+// A 1px dark line along each peg side that faces clear space. Drawn just
+// inside the peg, so pegs on the sprite's top row (the mandolin's) don't
+// lose their edge off the canvas. On the canvas, so it changes with
+// modifiers like the rest of the lute.
 function drawPegEdges(canvas, sprite, pixelSize) {
   const ratio = window.devicePixelRatio || 1;
   const block = Math.round(pixelSize * ratio);
@@ -87,10 +88,10 @@ function drawPegEdges(canvas, sprite, pixelSize) {
   for (const { x, y, side } of pegEdges(sprite)) {
     const left = x * block;
     const top = y * block;
-    if (side === 'top') context.fillRect(left, top - line, block, line);
-    if (side === 'bottom') context.fillRect(left, top + block, block, line);
-    if (side === 'left') context.fillRect(left - line, top, line, block);
-    if (side === 'right') context.fillRect(left + block, top, line, block);
+    if (side === 'top') context.fillRect(left, top, block, line);
+    if (side === 'bottom') context.fillRect(left, top + block - line, block, line);
+    if (side === 'left') context.fillRect(left, top, line, block);
+    if (side === 'right') context.fillRect(left + block - line, top, line, block);
   }
 }
 
