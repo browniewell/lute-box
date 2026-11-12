@@ -59,7 +59,7 @@
     </div>
   </div>
 
-  <!-- Both record panels, so the phone's Trophies tab can show them together. -->
+  <!-- Both record panels, so main.js can redraw them together. -->
   <div id="records">
     <section id="trophy-case" class="panel" aria-labelledby="trophy-heading">
       <div class="panel-head">
@@ -86,7 +86,8 @@
   <!-- Phone only (hidden by tavern.css on wider screens). -->
   <div class="tabs" role="tablist" aria-label="Lute Box">
     <button id="tab-play" type="button" role="tab" data-tab="play" aria-controls="play" aria-selected="true">Play</button>
-    <button id="tab-trophies" type="button" role="tab" data-tab="trophies" aria-controls="records" aria-selected="false" tabindex="-1">Trophies</button>
+    <button id="tab-trophies" type="button" role="tab" data-tab="trophies" aria-controls="trophy-case" aria-selected="false" tabindex="-1">Trophies</button>
+    <button id="tab-stats" type="button" role="tab" data-tab="stats" aria-controls="stats" aria-selected="false" tabindex="-1">Stats</button>
   </div>
 </main>
 

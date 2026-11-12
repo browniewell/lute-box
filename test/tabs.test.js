@@ -23,3 +23,10 @@ test('other keys leave the tabs alone', () => {
   assert.equal(nextTabIndex('Enter', 0, 2), null);
   assert.equal(nextTabIndex('ArrowDown', 0, 2), null);
 });
+
+// The phone bar has three tabs: Play, Trophies, Stats.
+test('arrows walk through all three phone tabs and wrap', () => {
+  assert.equal(nextTabIndex('ArrowRight', 1, 3), 2);
+  assert.equal(nextTabIndex('ArrowRight', 2, 3), 0);
+  assert.equal(nextTabIndex('ArrowLeft', 0, 3), 2);
+});
