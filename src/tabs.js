@@ -1,4 +1,4 @@
-// Keyboard moves between tabs (the phone layout's Play / Trophies bar),
+// Keyboard moves between tabs (the phone layout's Play / Trophies / Stats bar),
 // following the WAI-ARIA tabs pattern. Pure, so it's tested in Node.
 
 /**

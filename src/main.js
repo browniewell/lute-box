@@ -83,7 +83,7 @@ let opening = false;
 async function openNext() {
   if (opening) return;
   opening = true;
-  // Space can open a box from the phone's Trophies tab; show it happening.
+  // Space can open a box from the phone's Trophies or Stats tab; show it happening.
   showTab('play');
   // Before any await: browsers only allow starting audio during the click.
   if (soundOn) unlockAudio();
@@ -150,7 +150,8 @@ function showStorageNote(problem) {
 }
 
 // Phone tabs. On wider screens the tab bar is hidden and every panel shows,
-// so the panels only take the tabpanel role while the tabs are in use.
+// so the panels only take the tabpanel role while the tabs are in use. The
+// record panels keep their own heading as a label on wider screens.
 function showTab(id) {
   page.dataset.tab = id;
   for (const tab of tabs) {
@@ -160,15 +161,20 @@ function showTab(id) {
   }
 }
 
+const panels = tabs.map((tab) => {
+  const panel = document.getElementById(tab.getAttribute('aria-controls'));
+  return { tab, panel, ownLabel: panel.getAttribute('aria-labelledby') };
+});
+
 function setPanelRoles() {
-  for (const tab of tabs) {
-    const panel = document.getElementById(tab.getAttribute('aria-controls'));
+  for (const { tab, panel, ownLabel } of panels) {
     if (phone.matches) {
       panel.setAttribute('role', 'tabpanel');
       panel.setAttribute('aria-labelledby', tab.id);
     } else {
       panel.removeAttribute('role');
-      panel.removeAttribute('aria-labelledby');
+      if (ownLabel) panel.setAttribute('aria-labelledby', ownLabel);
+      else panel.removeAttribute('aria-labelledby');
     }
   }
 }
