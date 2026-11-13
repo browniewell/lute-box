@@ -10,6 +10,10 @@ const FLASH_MS = 500;
 const PARTICLE_MS = 900;
 const BEAM_MS = 1600;
 const SCREEN_SHAKE_MS = 600;
+// The particles ease out, so by this point they're faint specks and the
+// reveal looks finished. Open works again from here rather than waiting for
+// the last specks to vanish, which felt like a dropped tap on Rare.
+const PARTICLE_SETTLED_MS = 600;
 
 /**
  * Shows the unopened box in `stage`, shaking and glowing in the tier color,
@@ -39,7 +43,7 @@ export function playAnticipation(stage, plan, tierColor) {
 
 /**
  * Plays the reveal effects around the lute already drawn in `stage`, and
- * resolves when the last one has finished.
+ * resolves when they look finished (particles may still be fading out).
  *
  * @param {HTMLElement} stage
  * @param {HTMLElement} page Element to shake for screenShake. Not <body>:
@@ -63,7 +67,7 @@ export function playReveal(stage, page, plan, tierColor) {
   for (let i = 0; i < plan.particles; i++) {
     stage.append(makeParticle(plan, tierColor));
   }
-  if (plan.particles) durations.push(PARTICLE_MS);
+  if (plan.particles) durations.push(PARTICLE_SETTLED_MS);
 
   if (plan.flash) {
     const flash = document.createElement('div');
